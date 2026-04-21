@@ -316,7 +316,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // STATE
-const OAI_PROXY='https://wrhaztjpcnvicrrltuyj.supabase.co/functions/v1/smart-responder';
+const OAI_PROXY='https://n8nn-n8n.vhekam.easypanel.host/webhook/mesagrande-ai';
 let USER=null,RESTO=null,DATA={ventas:[],stock:[],merma:[],albaranes:[],facturas:[],proveedores:[],platos:[]};
 let charts={},xlsData=[],currentPage='resumen';
 let chatHistory=[];
@@ -495,20 +495,15 @@ function updateAlertCount(){
 }
 
 // ─── OPENAI via Edge Function (con token Supabase) ───────────────
-async function getAuthHeader(){
-  const{data:{session}}=await sb.auth.getSession();
-  return session?.access_token?{'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'}:{'Content-Type':'application/json'};
-}
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
-  const headers=await getAuthHeader();
-  const r=await fetch(OAI_PROXY,{method:'POST',headers,body:JSON.stringify({model,messages,max_tokens:maxTokens})});
-  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error OpenAI');}
-  return(await r.json()).choices[0].message.content;
+  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
+  if(!r.ok) throw new Error('Error OpenAI '+r.status);
+  const d=await r.json();
+  return d.choices[0].message.content;
 }
 async function visionOCR(base64,mimeType,prompt){
-  const headers=await getAuthHeader();
-  const r=await fetch(OAI_PROXY,{method:'POST',headers,body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
-  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error OpenAI Vision');}
+  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
+  if(!r.ok) throw new Error('Error Vision '+r.status);
   return(await r.json()).choices[0].message.content;
 }
 function parseJSON(str){
