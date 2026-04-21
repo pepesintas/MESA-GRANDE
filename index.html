@@ -497,14 +497,24 @@ function updateAlertCount(){
 // ─── OPENAI via Edge Function (con token Supabase) ───────────────
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
   const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
-  if(!r.ok) throw new Error('Error OpenAI '+r.status);
-  const d=await r.json();
-  return d.choices[0].message.content;
+  if(!r.ok) throw new Error('Error proxy '+r.status);
+  const text=await r.text();
+  let d;try{d=JSON.parse(text);}catch(e){throw new Error('Respuesta inválida del proxy');}
+  // n8n puede devolver array o objeto
+  if(Array.isArray(d))d=d[0];
+  if(d.choices) return d.choices[0].message.content;
+  if(d[0]?.choices) return d[0].choices[0].message.content;
+  throw new Error('Formato respuesta inesperado');
 }
 async function visionOCR(base64,mimeType,prompt){
   const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
-  if(!r.ok) throw new Error('Error Vision '+r.status);
-  return(await r.json()).choices[0].message.content;
+  if(!r.ok) throw new Error('Error proxy '+r.status);
+  const text=await r.text();
+  let d;try{d=JSON.parse(text);}catch(e){throw new Error('Respuesta inválida del proxy');}
+  if(Array.isArray(d))d=d[0];
+  if(d.choices) return d.choices[0].message.content;
+  if(d[0]?.choices) return d[0].choices[0].message.content;
+  throw new Error('Formato respuesta inesperado');
 }
 function parseJSON(str){
   try{const c=str.replace(/```json/gi,'').replace(/```/g,'').trim();const s=c.indexOf('{');const e=c.lastIndexOf('}');if(s>=0&&e>s)return JSON.parse(c.substring(s,e+1));}catch(e){}
