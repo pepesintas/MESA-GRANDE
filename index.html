@@ -494,26 +494,22 @@ function updateAlertCount(){
   else el.style.display='none';
 }
 
-// ─── OPENAI ──────────────────────────────────────────────────────
+// ─── OPENAI via Edge Function (con token Supabase) ───────────────
+async function getAuthHeader(){
+  const{data:{session}}=await sb.auth.getSession();
+  return session?.access_token?{'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'}:{'Content-Type':'application/json'};
+}
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
-  const r=await fetch(OAI_PROXY,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model,messages,max_tokens:maxTokens})
-  });
+  const headers=await getAuthHeader();
+  const r=await fetch(OAI_PROXY,{method:'POST',headers,body:JSON.stringify({model,messages,max_tokens:maxTokens})});
   if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error OpenAI');}
-  const d=await r.json();
-  return d.choices[0].message.content;
+  return(await r.json()).choices[0].message.content;
 }
 async function visionOCR(base64,mimeType,prompt){
-  const r=await fetch(OAI_PROXY,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})
-  });
+  const headers=await getAuthHeader();
+  const r=await fetch(OAI_PROXY,{method:'POST',headers,body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
   if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error OpenAI Vision');}
-  const d=await r.json();
-  return d.choices[0].message.content;
+  return(await r.json()).choices[0].message.content;
 }
 function parseJSON(str){
   try{const c=str.replace(/```json/gi,'').replace(/```/g,'').trim();const s=c.indexOf('{');const e=c.lastIndexOf('}');if(s>=0&&e>s)return JSON.parse(c.substring(s,e+1));}catch(e){}
