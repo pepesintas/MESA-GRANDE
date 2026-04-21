@@ -370,12 +370,7 @@ async function initApp(user){
   document.getElementById('user-email-sidebar').textContent=user.email;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  // Cargar API Key de OpenAI desde Supabase config
-  try{
-    const{data:cfg}=await sb.from('config').select('value').eq('id','oai_key').single();
-    // proxy usado
-    else console.warn('No se encontró oai_key en config');
-  }catch(e){console.warn('Error cargando config:',e.message);}
+
   await loadAll();
   goTo('resumen');
 }
