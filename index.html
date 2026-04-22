@@ -169,7 +169,7 @@ tr:hover td{background:var(--bg3);color:var(--text)}
 .chat-msg.ai .bubble{background:rgba(232,255,71,0.05);border:1px solid rgba(232,255,71,0.1);border-radius:8px 8px 8px 2px;padding:10px 14px;display:inline-block;max-width:85%;font-size:13px;color:var(--text);line-height:1.6}
 .chat-msg .role{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em}
 .chat-input-wrap{border-top:1px solid var(--border);padding:1rem;display:flex;gap:8px}
-.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:10px 12px;color:var(--text);outline:none;resize:none;height:44px}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 14px;color:var(--text);outline:none;resize:none;min-height:52px;max-height:160px;font-size:14px}
 .chat-input:focus{border-color:var(--text3)}
 .typing{display:flex;gap:4px;align-items:center;padding:10px 14px}
 .typing span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:bounce 1.2s infinite}
@@ -270,6 +270,8 @@ tr:hover td{background:var(--bg3);color:var(--text)}
       <div class="nav-section">Legal & Sanidad</div>
       <div class="nav-item" onclick="goTo('inspecciones')"><span class="nav-icon">✓</span>Inspecciones</div>
       <div class="nav-section">Configuración</div>
+      <div class="nav-item" onclick="goTo('libro')"><span class="nav-icon">📖</span>Libro del restaurante</div>
+      <div class="nav-item" onclick="goTo('alertas-config')"><span class="nav-icon">🔔</span>Mis alertas</div>
       <div class="nav-item" onclick="goTo('carta')"><span class="nav-icon">≡</span>Carta & Platos</div>
       <div class="nav-item" onclick="goTo('config')"><span class="nav-icon">◉</span>Restaurante</div>
     </nav>
@@ -299,6 +301,8 @@ tr:hover td{background:var(--bg3);color:var(--text)}
     <div id="page-gastos" class="hidden"></div>
     <div id="page-remesas" class="hidden"></div>
     <div id="page-inspecciones" class="hidden"></div>
+    <div id="page-libro" class="hidden"></div>
+    <div id="page-alertas-config" class="hidden"></div>
     <div id="page-carta" class="hidden"></div>
     <div id="page-config" class="hidden"></div>
   </div>
@@ -376,7 +380,7 @@ async function initApp(user){
 }
 
 // ─── NAVIGATION ─────────────────────────────────────────────────
-const PAGES=['resumen','alertas','consultora','ventas','stock','merma','albaranes','facturas','proveedores','registrar','sala','reservas','empleados','fichajes','caja','gastos','remesas','inspecciones','carta','config'];
+const PAGES=['resumen','alertas','consultora','ventas','stock','merma','albaranes','facturas','proveedores','registrar','sala','reservas','empleados','fichajes','caja','gastos','remesas','inspecciones','libro','alertas-config','carta','config'];
 function goTo(page){
   currentPage=page;
   PAGES.forEach(p=>{
@@ -389,7 +393,7 @@ function goTo(page){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
   // Render
-  const renders={resumen:renderResumen,alertas:renderAlertas,consultora:renderConsultora,ventas:renderVentas,stock:renderStock,merma:renderMerma,albaranes:renderAlbaranes,facturas:renderFacturas,proveedores:renderProveedores,registrar:renderRegistrar,sala:renderSala,reservas:renderReservas,empleados:renderEmpleados,fichajes:renderFichajes,caja:renderCaja,gastos:renderGastos,remesas:renderRemesas,inspecciones:renderInspecciones,carta:renderCarta,config:renderConfig};
+  const renders={resumen:renderResumen,alertas:renderAlertas,consultora:renderConsultora,ventas:renderVentas,stock:renderStock,merma:renderMerma,albaranes:renderAlbaranes,facturas:renderFacturas,proveedores:renderProveedores,registrar:renderRegistrar,sala:renderSala,reservas:renderReservas,empleados:renderEmpleados,fichajes:renderFichajes,caja:renderCaja,gastos:renderGastos,remesas:renderRemesas,inspecciones:renderInspecciones,libro:renderLibro,'alertas-config':renderAlertasConfig,carta:renderCarta,config:renderConfig};
   if(renders[page]) renders[page]();
 }
 function toggleSidebar(){
@@ -484,6 +488,9 @@ function calcAlertas(){
     const d=(last-prev)/prev*100;
     if(d>5) alerts.push({type:'yellow',title:`Subida precio: ${p.replace(/_/g,' ')}`,desc:`+${d.toFixed(1)}% (${num(prev).toFixed(2)}€ → ${num(last).toFixed(2)}€)`,page:'albaranes'});
   });
+  // Alertas personalizadas del usuario
+  const custom=JSON.parse(localStorage.getItem('mg_alertas_custom')||'[]');
+  custom.forEach(a=>alerts.push({type:a.tipo,title:a.titulo,desc:a.desc,page:'alertas-config'}));
   if(!alerts.length) alerts.push({type:'green',title:'Todo bajo control',desc:'Sin anomalías detectadas'});
   return alerts;
 }
@@ -1592,6 +1599,136 @@ async function saveInsp(){
 async function resolverInsp(id){try{const f=new Date().toISOString().split('T')[0];await dbUpd('inspecciones',id,{fecha_resolucion:f});DATA.inspecciones=DATA.inspecciones.map(i=>i.id===id?{...i,fecha_resolucion:f}:i);showToast('Resuelto ✓');renderInspecciones();}catch(e){showToast('Error','err');}}
 
 // ─── CARTA & PLATOS ───────────────────────────────────────────────
+// ── LIBRO DEL RESTAURANTE ─────────────────────────────────────────
+function renderLibro(){
+  const el=document.getElementById('page-libro');
+  const prods=JSON.parse(localStorage.getItem('mg_productos')||'[]');
+  const provs=JSON.parse(localStorage.getItem('mg_proveedores')||'[]');
+  el.innerHTML=`
+    <div class="page-header"><div><div class="page-title">📖 Libro del restaurante</div><div class="page-sub">Productos, precios y proveedores</div></div></div>
+    <div class="stabs" id="libro-tabs">
+      <button class="stab active" onclick="showLibroTab('productos',this)">Productos & Precios</button>
+      <button class="stab" onclick="showLibroTab('proveedores',this)">Proveedores</button>
+      <button class="stab" onclick="showLibroTab('escandallos',this)">Escandallos</button>
+    </div>
+    <div id="libro-content"></div>`;
+  showLibroTab('productos');
+}
+
+function showLibroTab(tab,btn){
+  document.querySelectorAll('#libro-tabs .stab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const prods=JSON.parse(localStorage.getItem('mg_productos')||'[]');
+  const provs=JSON.parse(localStorage.getItem('mg_proveedores')||'[]');
+  const tabs={
+    productos:`<div class="card">
+      <div class="card-title">Añadir producto</div>
+      <div class="form-row">
+        <div class="field"><label>Nombre</label><input class="fi" id="lp-nom" type="text" placeholder="Ej: burrito_rebozado_BBQ"></div>
+        <div class="field"><label>Categoría</label><select class="fi" id="lp-cat"><option value="burrito">Burrito</option><option value="empanada">Empanada</option><option value="bebida">Bebida</option><option value="otro">Otro</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Precio venta (€)</label><input class="fi" id="lp-pv" type="number" step="0.01" placeholder="0.00"></div>
+        <div class="field"><label>Precio coste (€)</label><input class="fi" id="lp-pc" type="number" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Proveedor</label><input class="fi" id="lp-prov" type="text" placeholder="Nombre del proveedor"></div>
+        <div class="field"><label>Unidad</label><select class="fi" id="lp-unidad"><option value="ud">Unidad</option><option value="kg">Kg</option><option value="caja">Caja</option><option value="l">Litro</option></select></div>
+      </div>
+      <div class="form-actions"><button class="btn btn-accent btn-sm" onclick="saveProductoLibro()">Añadir producto</button></div>
+    </div>
+    ${prods.length?`<div class="table-wrap"><table><thead><tr><th>Producto</th><th>Categoría</th><th style="text-align:right">P. Venta</th><th style="text-align:right">P. Coste</th><th style="text-align:right">Margen</th><th>Proveedor</th><th></th></tr></thead>
+    <tbody>${prods.map((p,i)=>{const m=p.pv>0?((p.pv-p.pc)/p.pv*100):0;return`<tr><td style="color:var(--text);font-weight:500">${p.nombre}</td><td><span class="badge badge-gray">${p.cat}</span></td><td style="text-align:right;color:var(--accent)">${parseFloat(p.pv||0).toFixed(2)}€</td><td style="text-align:right">${parseFloat(p.pc||0).toFixed(2)}€</td><td style="text-align:right;color:${m>30?'var(--green)':m>15?'var(--yellow)':'var(--red)'}">${m.toFixed(1)}%</td><td>${p.prov||'—'}</td><td><button class="btn btn-xs btn-danger" onclick="deleteProductoLibro(${i})">✕</button></td></tr>`;}).join('')}</tbody></table></div>`:'<div class="empty">Sin productos. Añade tu catálogo.</div>'}`,
+    proveedores:`<div class="card">
+      <div class="card-title">Añadir proveedor</div>
+      <div class="form-row">
+        <div class="field"><label>Nombre</label><input class="fi" id="lprov-nom" type="text" placeholder="Nombre del proveedor"></div>
+        <div class="field"><label>Contacto</label><input class="fi" id="lprov-tel" type="text" placeholder="Teléfono o email"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>IBAN</label><input class="fi" id="lprov-iban" type="text" placeholder="ES00 0000..."></div>
+        <div class="field"><label>Productos que suministra</label><input class="fi" id="lprov-prods" type="text" placeholder="empanadas, burritos..."></div>
+      </div>
+      <div class="form-actions"><button class="btn btn-accent btn-sm" onclick="saveProveedorLibro()">Añadir proveedor</button></div>
+    </div>
+    ${provs.length?`<div class="table-wrap"><table><thead><tr><th>Proveedor</th><th>Contacto</th><th>IBAN</th><th>Productos</th><th></th></tr></thead>
+    <tbody>${provs.map((p,i)=>`<tr><td style="color:var(--text);font-weight:500">${p.nombre}</td><td>${p.tel||'—'}</td><td>${p.iban||'—'}</td><td>${p.prods||'—'}</td><td><button class="btn btn-xs btn-danger" onclick="deleteProveedorLibro(${i})">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Sin proveedores registrados.</div>'}`,
+    escandallos:`<div class="card"><div class="card-title">Escandallos — próximamente</div><p style="font-size:13px;color:var(--text3)">Aquí podrás definir qué ingredientes lleva cada plato y calcular el coste real automáticamente.</p></div>`
+  };
+  document.getElementById('libro-content').innerHTML=tabs[tab]||'';
+}
+
+function saveProductoLibro(){
+  const prods=JSON.parse(localStorage.getItem('mg_productos')||'[]');
+  const nom=document.getElementById('lp-nom')?.value.trim();
+  if(!nom){showToast('Introduce el nombre','err');return;}
+  prods.push({nombre:nom,cat:document.getElementById('lp-cat')?.value,pv:document.getElementById('lp-pv')?.value,pc:document.getElementById('lp-pc')?.value,prov:document.getElementById('lp-prov')?.value,unidad:document.getElementById('lp-unidad')?.value});
+  localStorage.setItem('mg_productos',JSON.stringify(prods));
+  showToast('Producto añadido ✓');
+  showLibroTab('productos');
+}
+function deleteProductoLibro(i){
+  const prods=JSON.parse(localStorage.getItem('mg_productos')||'[]');
+  prods.splice(i,1);localStorage.setItem('mg_productos',JSON.stringify(prods));
+  showLibroTab('productos');
+}
+function saveProveedorLibro(){
+  const provs=JSON.parse(localStorage.getItem('mg_proveedores')||'[]');
+  const nom=document.getElementById('lprov-nom')?.value.trim();
+  if(!nom){showToast('Introduce el nombre','err');return;}
+  provs.push({nombre:nom,tel:document.getElementById('lprov-tel')?.value,iban:document.getElementById('lprov-iban')?.value,prods:document.getElementById('lprov-prods')?.value});
+  localStorage.setItem('mg_proveedores',JSON.stringify(provs));
+  showToast('Proveedor añadido ✓');
+  showLibroTab('proveedores');
+}
+function deleteProveedorLibro(i){
+  const provs=JSON.parse(localStorage.getItem('mg_proveedores')||'[]');
+  provs.splice(i,1);localStorage.setItem('mg_proveedores',JSON.stringify(provs));
+  showLibroTab('proveedores');
+}
+
+// ── MIS ALERTAS ───────────────────────────────────────────────────
+function renderAlertasConfig(){
+  const el=document.getElementById('page-alertas-config');
+  const alertas=JSON.parse(localStorage.getItem('mg_alertas_custom')||'[]');
+  el.innerHTML=`
+    <div class="page-header"><div><div class="page-title">🔔 Mis alertas</div><div class="page-sub">Define tus propias alertas personalizadas</div></div></div>
+    <div class="card">
+      <div class="card-title">Nueva alerta</div>
+      <div class="form-row">
+        <div class="field"><label>Título</label><input class="fi" id="ac-titulo" type="text" placeholder="Ej: Stock mínimo de burritos"></div>
+        <div class="field"><label>Tipo</label><select class="fi" id="ac-tipo"><option value="red">🔴 Crítica</option><option value="yellow">🟡 Aviso</option><option value="blue">🔵 Informativa</option></select></div>
+      </div>
+      <div class="field"><label>Descripción / Condición</label><input class="fi" id="ac-desc" type="text" placeholder="Ej: Revisar cuando sobrante de burrito BBQ sea mayor de 30 uds"></div>
+      <div class="form-actions"><button class="btn btn-accent btn-sm" onclick="saveAlertaCustom()">Añadir alerta</button></div>
+    </div>
+    <div class="card-title" style="margin-top:1rem">Alertas activas</div>
+    ${alertas.length?alertas.map((a,i)=>`
+      <div class="alert-item">
+        <div class="alert-dot ${a.tipo}"></div>
+        <div class="alert-body">
+          <div class="alert-title">${a.titulo}</div>
+          <div class="alert-desc">${a.desc}</div>
+        </div>
+        <span class="badge badge-${a.tipo==='red'?'red':a.tipo==='blue'?'blue':'yellow'}">${a.tipo==='red'?'Crítica':a.tipo==='blue'?'Info':'Aviso'}</span>
+        <button class="btn btn-xs btn-danger" onclick="deleteAlertaCustom(${i})" style="margin-left:8px">✕</button>
+      </div>`).join(''):'<div class="empty">Sin alertas personalizadas. Añade las que necesites.</div>'}`;
+}
+function saveAlertaCustom(){
+  const alertas=JSON.parse(localStorage.getItem('mg_alertas_custom')||'[]');
+  const titulo=document.getElementById('ac-titulo')?.value.trim();
+  if(!titulo){showToast('Introduce el título','err');return;}
+  alertas.push({titulo,tipo:document.getElementById('ac-tipo')?.value,desc:document.getElementById('ac-desc')?.value});
+  localStorage.setItem('mg_alertas_custom',JSON.stringify(alertas));
+  showToast('Alerta añadida ✓');
+  renderAlertasConfig();
+}
+function deleteAlertaCustom(i){
+  const alertas=JSON.parse(localStorage.getItem('mg_alertas_custom')||'[]');
+  alertas.splice(i,1);localStorage.setItem('mg_alertas_custom',JSON.stringify(alertas));
+  renderAlertasConfig();
+}
+
 function renderCarta(){
   const el=document.getElementById('page-carta');
   el.innerHTML=`
