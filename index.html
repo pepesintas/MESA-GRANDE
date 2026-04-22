@@ -424,15 +424,6 @@ async function insMany(table,rows){
 }
 async function loadAll(){
   try{
-    // Verificar que la sesión de Supabase es válida antes de cargar
-    const {data:{session}} = await sb.auth.getSession();
-    if(!session && USER){
-      // Sesión rota — limpiar y recargar
-      console.warn('Sesión rota detectada — limpiando...');
-      localStorage.clear();
-      location.reload();
-      return;
-    }
     const[ventas,stock,merma,albaranes,platos]=await Promise.all([
       q('ventas',{order:'created_at',asc:false,limit:2000}),
       q('stock',{order:'created_at',asc:false,limit:2000}),
@@ -442,13 +433,7 @@ async function loadAll(){
     ]);
     DATA={ventas,stock,merma,albaranes,platos,facturas:[],proveedores:getProveedoresFromAlbaranes(albaranes)};
     updateAlertCount();
-  }catch(e){
-    if(e.message?.includes('JWT')||e.message?.includes('session')){
-      localStorage.clear();location.reload();
-    } else {
-      showToast('Error cargando datos: '+e.message,'err');
-    }
-  }
+  }catch(e){showToast('Error cargando datos: '+e.message,'err');}
 }
 function getProveedoresFromAlbaranes(albs){
   const map={};
