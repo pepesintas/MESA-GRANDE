@@ -316,7 +316,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // STATE
-const OAI_PROXY='https://wrhaztjpcnvicrrltuyj.supabase.co/functions/v1/smart-responder';
+const OAI_PROXY='https://n8nn-n8n.vhekam.easypanel.host/webhook/mesagrande-ai';
 let USER=null,RESTO=null,DATA={ventas:[],stock:[],merma:[],albaranes:[],facturas:[],proveedores:[],platos:[]};
 let charts={},xlsData=[],currentPage='resumen';
 let chatHistory=[];
@@ -495,26 +495,20 @@ function updateAlertCount(){
 }
 
 // ─── OPENAI via Edge Function (con token Supabase) ───────────────
-async function callProxy(body,retries=2){
-  for(let i=0;i<=retries;i++){
-    try{
-      const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify(body)});
-      if(!r.ok){const e=await r.text();throw new Error('Error '+r.status+': '+e);}
-      return await r.json();
-    }catch(e){
-      if(i===retries)throw e;
-      await new Promise(res=>setTimeout(res,2000));
-    }
-  }
-}
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
-  const d=await callProxy({model,messages,max_tokens:maxTokens});
-  if(!d?.choices) throw new Error('Sin respuesta de IA');
+  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
+  const text=await r.text();
+  if(!text||!text.trim()) throw new Error('Respuesta vacía del servidor');
+  const d=JSON.parse(text);
+  if(!d.choices) throw new Error('Sin choices en respuesta');
   return d.choices[0].message.content;
 }
 async function visionOCR(base64,mimeType,prompt){
-  const d=await callProxy({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]});
-  if(!d?.choices) throw new Error('Sin respuesta Vision');
+  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
+  const text=await r.text();
+  if(!text||!text.trim()) throw new Error('Respuesta vacía del servidor');
+  const d=JSON.parse(text);
+  if(!d.choices) throw new Error('Sin choices en respuesta');
   return d.choices[0].message.content;
 }
 function parseJSON(str){
