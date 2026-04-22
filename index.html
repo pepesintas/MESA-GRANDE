@@ -495,16 +495,26 @@ function updateAlertCount(){
 }
 
 // ─── OPENAI via Edge Function (con token Supabase) ───────────────
+async function callProxy(body,retries=2){
+  for(let i=0;i<=retries;i++){
+    try{
+      const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify(body)});
+      if(!r.ok){const e=await r.text();throw new Error('Error '+r.status+': '+e);}
+      return await r.json();
+    }catch(e){
+      if(i===retries)throw e;
+      await new Promise(res=>setTimeout(res,2000));
+    }
+  }
+}
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
-  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
-  if(!r.ok) throw new Error('Error '+r.status);
-  const d=await r.json();
+  const d=await callProxy({model,messages,max_tokens:maxTokens});
+  if(!d?.choices) throw new Error('Sin respuesta de IA');
   return d.choices[0].message.content;
 }
 async function visionOCR(base64,mimeType,prompt){
-  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY},body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
-  if(!r.ok) throw new Error('Error '+r.status);
-  const d=await r.json();
+  const d=await callProxy({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]});
+  if(!d?.choices) throw new Error('Sin respuesta Vision');
   return d.choices[0].message.content;
 }
 function parseJSON(str){
