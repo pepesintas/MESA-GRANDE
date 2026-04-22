@@ -316,7 +316,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // STATE
-const OAI_PROXY='https://n8nn-n8n.vhekam.easypanel.host/webhook/mesagrande-ai';
+const OAI_PROXY='/.netlify/functions/openai-proxy';
 let USER=null,RESTO=null,DATA={ventas:[],stock:[],merma:[],albaranes:[],facturas:[],proveedores:[],platos:[]};
 let charts={},xlsData=[],currentPage='resumen';
 let chatHistory=[];
