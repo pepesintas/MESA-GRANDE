@@ -496,19 +496,28 @@ function updateAlertCount(){
 
 // ─── OPENAI via Edge Function (con token Supabase) ───────────────
 async function callOpenAI(messages,model='gpt-4o-mini',maxTokens=1500){
-  const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
+  console.log('Llamando a proxy:', OAI_PROXY);
+  let r;
+  try{
+    r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,messages,max_tokens:maxTokens})});
+  }catch(fetchErr){
+    console.error('Fetch error:', fetchErr);
+    throw new Error('No se pudo conectar al servidor: '+fetchErr.message);
+  }
+  console.log('Respuesta status:', r.status);
   const text=await r.text();
+  console.log('Respuesta texto:', text.substring(0,200));
   if(!text||!text.trim()) throw new Error('Respuesta vacía del servidor');
   const d=JSON.parse(text);
-  if(!d.choices) throw new Error('Sin choices en respuesta');
+  if(!d.choices) throw new Error('Sin choices. Respuesta: '+JSON.stringify(d).substring(0,100));
   return d.choices[0].message.content;
 }
 async function visionOCR(base64,mimeType,prompt){
   const r=await fetch(OAI_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-4o',max_tokens:2000,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:${mimeType};base64,${base64}`}},{type:'text',text:prompt}]}]})});
   const text=await r.text();
-  if(!text||!text.trim()) throw new Error('Respuesta vacía del servidor');
+  if(!text||!text.trim()) throw new Error('Respuesta vacía');
   const d=JSON.parse(text);
-  if(!d.choices) throw new Error('Sin choices en respuesta');
+  if(!d.choices) throw new Error('Sin choices en respuesta Vision');
   return d.choices[0].message.content;
 }
 function parseJSON(str){
