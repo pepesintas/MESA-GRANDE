@@ -733,7 +733,7 @@ function renderCaja(){
   const el=document.getElementById('page-caja');
   const hoy=new Date().toISOString().split('T')[0];
   const fE=v=>(parseFloat(v)||0).toFixed(2)+'€';
-  el.innerHTML=`<div class="page-header"><div><div class="page-title">Caja diaria</div></div></div>
+  el.innerHTML=`<div class="page-header"><div><div class="page-title">Caja diaria</div></div><button class="btn btn-accent btn-sm" onclick="cobrarTarjeta()">💳 Cobrar con tarjeta</button></div>
   <div class="metrics">
     <div class="metric"><div class="metric-label">Efectivo total</div><div class="metric-value">${fmtEur((DATA.caja||[]).reduce((s,c)=>s+n(c.efectivo),0))}</div></div>
     <div class="metric"><div class="metric-label">Tarjeta total</div><div class="metric-value">${fmtEur((DATA.caja||[]).reduce((s,c)=>s+n(c.tarjeta),0))}</div></div>
@@ -745,6 +745,15 @@ function renderCaja(){
   <div class="field"><label>Cierre real (€)</label><input class="fi" id="cj-cie" type="number" step="0.01" placeholder="0.00"></div>
   <div class="form-actions"><button class="btn btn-accent btn-sm" onclick="saveCaja()">Guardar cuadre</button></div></div>
   <div class="table-wrap"><table><thead><tr><th>Fecha</th><th style="text-align:right">Efectivo</th><th style="text-align:right">Tarjeta</th><th style="text-align:right">Gastos</th><th style="text-align:right">Descuadre</th></tr></thead><tbody>${(DATA.caja||[]).slice(0,20).map(c=>`<tr><td>${fmtDate(c.fecha)}</td><td style="text-align:right">${fE(c.efectivo)}</td><td style="text-align:right">${fE(c.tarjeta)}</td><td style="text-align:right;color:var(--red)">${fE(c.gastos)}</td><td style="text-align:right;color:${Math.abs(n(c.descuadre))>20?'var(--red)':'var(--green)'}">${fE(c.descuadre)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Sin registros</td></tr>'}</tbody></table></div>`;
+}
+function cobrarTarjeta(){
+  const imp=prompt('Importe a cobrar con tarjeta (€):','');
+  if(imp===null)return;
+  const amount=parseFloat(String(imp).replace(',','.'));
+  if(!(amount>0)){showToast('Importe inválido','err');return;}
+  const concept=prompt('Concepto (opcional):','Cobro en caja')||'Cobro en caja';
+  // Abre el TPV de Redsys en una pestaña nueva
+  window.open('/pago.html?amount='+encodeURIComponent(amount.toFixed(2))+'&concept='+encodeURIComponent(concept),'_blank');
 }
 async function saveCaja(){
   const hoy=new Date().toISOString().split('T')[0],ap=n(document.getElementById('cj-ap')?.value),ef=n(document.getElementById('cj-ef')?.value),tar=n(document.getElementById('cj-tar')?.value),gas=n(document.getElementById('cj-gas')?.value),cie=n(document.getElementById('cj-cie')?.value);

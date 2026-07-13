@@ -1,6 +1,15 @@
 [build]
   functions = "netlify/functions"
 
+# URL bonita para el checkout de Redsys
+[[redirects]]
+  from = "/pago"
+  to = "/pago.html"
+  status = 200
+
+# SPA: todo lo demás sirve la app. Sin force, por lo que los ficheros
+# estáticos existentes (pago.html, pago-ok.html, pago-ko.html) y las
+# funciones (/.netlify/functions/*) se sirven tal cual antes de esta regla.
 [[redirects]]
   from = "/*"
   to = "/index.html"

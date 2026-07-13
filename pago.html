@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MESAGRANDE · Pago con tarjeta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--text2:#999;--text3:#555;--accent:#e8ff47;--red:#ff4f4f;--green:#4fff8f;--radius:10px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:2rem}
+.brand{font-size:26px;font-weight:600;letter-spacing:-1px;margin-bottom:2px}
+.brand span{color:var(--accent)}
+.sub{font-size:12px;color:var(--text3);margin-bottom:1.75rem}
+.field{margin-bottom:1rem}
+.field label{font-size:11px;color:var(--text3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.fi{width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;font-size:15px}
+.fi:focus{border-color:var(--accent)}
+.amount-in{font-family:var(--mono);font-size:22px;text-align:center;letter-spacing:.5px}
+.btn{width:100%;padding:13px;border:none;border-radius:8px;background:var(--accent);color:#0f0f0f;cursor:pointer;font-weight:600;font-size:15px;margin-top:.5rem}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.err{font-size:12px;color:var(--red);margin-top:12px;padding:10px;background:rgba(255,79,79,.08);border-radius:8px;display:none}
+.env{margin-top:1.25rem;font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
+.env b{color:var(--text2);font-weight:500}
+.env code{font-family:var(--mono);color:var(--accent)}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(232,255,71,.12);color:var(--accent);letter-spacing:.05em;margin-left:6px;vertical-align:middle}
+.rs{margin-top:1.5rem;text-align:center;font-size:11px;color:var(--text3)}
+</style>
+</head>
+<body>
+<form class="card" id="pay-form" autocomplete="off">
+  <div class="brand">MESA<span>GRANDE</span></div>
+  <div class="sub">Pago con tarjeta · Redsys TPV Virtual<span class="badge" id="env-badge">PRUEBAS</span></div>
+
+  <div class="field">
+    <label>Importe (€)</label>
+    <input class="fi amount-in" id="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required inputmode="decimal">
+  </div>
+  <div class="field">
+    <label>Concepto</label>
+    <input class="fi" id="concept" type="text" maxlength="120" placeholder="Cuenta mesa 4">
+  </div>
+
+  <button class="btn" id="btn-pay" type="submit">Pagar con tarjeta</button>
+  <div class="err" id="err"></div>
+
+  <div class="env" id="test-help">
+    <b>Tarjeta de prueba Redsys:</b><br>
+    <code>4548 8120 4940 0004</code> · Cad. <code>12/34</code> · CVV <code>123</code><br>
+    CIP autenticación: <code>123456</code>
+  </div>
+  <div class="rs">Pago seguro procesado por Redsys. MESAGRANDE no almacena datos de tarjeta.</div>
+</form>
+
+<script>
+const $ = id => document.getElementById(id)
+const params = new URLSearchParams(location.search)
+// permite prellenar desde la app: pago.html?amount=23.50&concept=Mesa%204
+if (params.get('amount')) $('amount').value = parseFloat(params.get('amount')).toFixed(2)
+if (params.get('concept')) $('concept').value = params.get('concept')
+
+function submitToRedsys(data){
+  const f = document.createElement('form')
+  f.method = 'POST'
+  f.action = data.endpoint
+  for (const k of ['Ds_SignatureVersion','Ds_MerchantParameters','Ds_Signature']){
+    const i = document.createElement('input')
+    i.type = 'hidden'; i.name = k; i.value = data[k]
+    f.appendChild(i)
+  }
+  document.body.appendChild(f)
+  f.submit()
+}
+
+$('pay-form').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const btn = $('btn-pay'), err = $('err')
+  err.style.display = 'none'
+  const amount = parseFloat($('amount').value)
+  if (!(amount > 0)){ err.textContent = 'Introduce un importe válido.'; err.style.display = 'block'; return }
+  btn.disabled = true; btn.textContent = 'Conectando con Redsys…'
+  try{
+    const r = await fetch('/.netlify/functions/redsys-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, concept: $('concept').value || 'Pago MESAGRANDE' })
+    })
+    const data = await r.json()
+    if (!r.ok || data.error) throw new Error(data.error || 'Error al iniciar el pago')
+    $('env-badge').textContent = data.env === 'live' ? 'REAL' : 'PRUEBAS'
+    if (data.env === 'live') $('test-help').style.display = 'none'
+    submitToRedsys(data)  // redirige al TPV
+  }catch(ex){
+    err.textContent = ex.message; err.style.display = 'block'
+    btn.disabled = false; btn.textContent = 'Pagar con tarjeta'
+  }
+})
+</script>
+</body>
+</html>
