@@ -1,0 +1,8 @@
+Pon aquí tu logo con el nombre exacto:
+
+    logo.png
+
+Es el que se usa en la navegación, en el pie y como icono de pestaña.
+Recomendado: PNG cuadrado con fondo transparente, 512x512 px.
+
+Hasta que no lo pongas, en la web saldrá un hueco donde va el logo.

@@ -1,0 +1,32 @@
+# Configuración de Netlify.
+# Sin este archivo, un despliegue arrastrando la carpeta no detecta
+# la función del auditor y /api/auditar devuelve 404.
+
+[build]
+  publish    = "."
+  functions  = "netlify/functions"
+
+# El auditor pasó a ser la portada. Los enlaces antiguos siguen valiendo.
+[[redirects]]
+  from   = "/auditor"
+  to     = "/"
+  status = 301
+
+# Los dos archivos de documentación no son parte del sitio.
+[[redirects]]
+  from   = "/LEEME.md"
+  to     = "/"
+  status = 301
+
+[[redirects]]
+  from   = "/auditor-url-cambios.md"
+  to     = "/"
+  status = 301
+
+# Cabeceras de seguridad básicas.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"

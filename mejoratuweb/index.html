@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Por qué tu negocio no aparece en Google? · Mejora tu web</title>
+<meta name="description" content="Escribe la dirección de tu web y te decimos en treinta segundos qué le falta para que Google te encuentre. Gratis, sin registro y sin dejar el correo.">
+<link rel="canonical" href="https://mejoratuweb.world/">
+<link rel="icon" href="/img/logo.png">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mejoratuweb.world/">
+<meta property="og:title" content="¿Por qué tu negocio no aparece en Google?">
+<meta property="og:description" content="Analiza tu web gratis en treinta segundos y descubre qué le falta.">
+<meta property="og:image" content="https://mejoratuweb.world/img/portada-auditor.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
+
+<link rel="stylesheet" href="/estilo.css">
+
+<style>
+:root{
+  color-scheme: light;
+  --bg:#EAE3DE;
+  --surface:rgba(255,255,255,.45);
+  --surface-2:rgba(255,255,255,.62);
+  --ink:#175A67;
+  --ink-2:#2A707C;
+  --ink-3:#5C8D96;
+  --line:rgba(23,90,103,.18);
+  --line-2:rgba(23,90,103,.34);
+  --accent:#175A67;
+  --accent-soft:rgba(23,90,103,.07);
+  --bad:#A8271C;
+  --bad-soft:rgba(168,39,28,.09);
+  --warn:#8A5D00;
+  --warn-soft:rgba(138,93,0,.10);
+  --ok:#1F6B4A;
+  --ok-soft:rgba(31,107,74,.10);
+  --r:10px;
+}
+
+
+
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Poppins',"Helvetica Neue",Arial,sans-serif;
+  font-size:15.5px;line-height:1.55;
+  padding:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:800px;margin:0 auto;padding-inline:clamp(1.25rem,4vw,4.5rem);}
+
+header{padding-block:52px 26px;}
+.kicker{
+  font-family:inherit;font-size:11px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 12px;
+}
+h1{
+  font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;
+  font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.035em;
+    margin:0 0 12px;text-wrap:balance;
+}
+.sub{color:var(--ink-2);margin:0;max-width:58ch;font-size:16.5px;}
+
+/* entrada */
+.input-card{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:16px;
+  padding:24px;margin-bottom:26px;
+}
+.input-card label{display:block;font-weight:600;font-size:14.5px;margin-bottom:5px;}
+.how{font-size:13.5px;color:var(--ink-2);margin:0 0 12px;}
+kbd{
+  font-family:inherit;font-size:12px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-bottom-width:2px;border-radius:4px;padding:1px 5px;
+}
+.url-row{
+  display:flex;align-items:stretch;
+  border:1px solid var(--line-2);border-radius:6px;
+  background:var(--bg);overflow:hidden;
+}
+.url-row:focus-within{outline:2px solid var(--accent);outline-offset:1px;}
+.proto{
+  display:flex;align-items:center;padding:0 4px 0 13px;
+  font-family:inherit;font-size:13.5px;
+  color:var(--ink-2);background:var(--surface-2);border-right:1px solid var(--line-2);
+}
+/* 16px no es capricho: por debajo, Safari en iPhone hace zoom al tocar el campo. */
+.url-row input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;
+  color:var(--ink);font:inherit;font-size:16px;padding:12px 13px;
+}
+.err{color:var(--bad);font-size:14px;margin:12px 0 0;}
+button[disabled]{opacity:.55;cursor:progress;}
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px;}
+button{
+  font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;
+  border-radius:999px;padding:11px 20px;border:1px solid transparent;
+  transition:opacity .12s,border-color .12s;
+}
+.b-main{background:var(--ink);color:var(--bg);}
+.b-main:hover{background:#0F454F;}
+.b-ghost{background:transparent;border-color:var(--line-2);color:var(--ink-2);}
+.b-ghost:hover{border-color:var(--accent);color:var(--accent);}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* marcador */
+.score{
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:16px;
+  padding:22px 24px;margin-bottom:10px;
+}
+.dial{flex:0 0 auto;}
+.score-txt h2{
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;
+  margin:0 0 3px;font-weight:600;
+}
+.score-txt p{margin:0;color:var(--ink-2);font-size:14.5px;max-width:44ch;}
+
+/* bloques */
+.block{margin-bottom:22px;}
+.block-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:0 2px 8px;border-bottom:1px solid var(--line-2);margin-bottom:0;
+}
+.block-head h3{
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;
+  margin:0;font-weight:600;letter-spacing:-.01em;
+}
+.tally{
+  font-family:inherit;font-size:12px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.items{list-style:none;margin:0;padding:0;}
+.item{
+  display:flex;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line);
+  align-items:flex-start;
+}
+.item:last-child{border-bottom:0;}
+.mark{
+  flex:0 0 auto;width:19px;height:19px;border-radius:50%;margin-top:2px;
+  display:grid;place-items:center;font-size:11px;font-weight:700;
+  font-family:inherit;
+}
+.m-bad{background:var(--bad-soft);color:var(--bad);}
+.m-warn{background:var(--warn-soft);color:var(--warn);}
+.m-ok{background:var(--ok-soft);color:var(--ok);}
+.item-body{min-width:0;}
+.item-t{font-weight:600;font-size:14.5px;margin:0 0 2px;}
+.item-d{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.45;}
+.item-d code{
+  font-family:inherit;font-size:12px;
+  background:var(--surface-2);padding:1px 4px;border-radius:3px;
+  overflow-wrap:anywhere;
+}
+.crit{
+  display:inline-block;font-family:inherit;font-size:10px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--bad);
+  border:1px solid var(--bad);border-radius:3px;padding:0 4px;margin-left:7px;
+  vertical-align:1px;
+}
+
+/* cierre */
+.close{
+  background:var(--accent-soft);border:1px solid var(--accent);
+  border-radius:var(--r);padding:24px 22px;margin:28px 0 20px;
+}
+.close h2{
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;
+  margin:0 0 8px;font-weight:600;
+}
+.close p{margin:0 0 16px;font-size:15px;color:var(--ink-2);max-width:54ch;}
+.note{
+  margin-top:14px;padding:12px 14px;border-radius:6px;background:var(--surface);
+  border:1px solid var(--line);font-size:14px;color:var(--ink-2);
+}
+[hidden]{display:none !important;}
+footer{
+  border-top:1px solid var(--line);padding-block:16px 48px;margin-top:6px;
+  color:var(--ink-3);font-size:13px;
+}
+footer p{margin:0 0 5px;}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+@media (max-width:560px){
+  /* el recuento no cabe en una línea: lo bajamos y lo dejamos partir */
+  .block-head{flex-direction:column;align-items:flex-start;gap:5px;}
+  .tally{white-space:normal;}
+}
+@media (max-width:430px){
+  header{padding-block:36px 20px;}
+  .score{padding:16px;}
+}
+
+
+/* ── pantallas anchas: el contenido deja de ser una tira estrecha ──
+   A partir de 1080px el informe comparte fila con una columna
+   lateral. Es también donde iría un anuncio de escritorio. */
+.wrap{max-width:1180px;}
+.cols{display:block;}
+@media (min-width:1080px){
+  .cols{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 300px;
+    gap:clamp(2rem,3vw,3.5rem);
+    align-items:start;
+  }
+  .lateral{position:sticky;top:96px;}
+}
+.lateral{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
+@media (min-width:1080px){ .lateral{margin-top:0;} }
+.caja{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);padding:1.2rem 1.25rem;
+}
+.caja h3{
+  margin:0 0 .8rem;font-family:'Poppins',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+}
+.caja ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.6rem;}
+.caja li{margin:0;font-size:.88rem;color:var(--ink-2);display:flex;gap:.6rem;align-items:flex-start;}
+.caja li b{color:var(--ink);font-weight:600;flex:0 0 auto;}
+.caja a{display:block;font-size:.9rem;color:var(--ink);text-decoration:none;padding:.35rem 0;}
+.caja a:hover{opacity:.62;}
+
+/* lista de servicios de la sección de venta */
+.servicios{display:flex;flex-direction:column;gap:0;margin:0 0 24px;}
+.serv{
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:16px 24px;flex-wrap:wrap;
+  padding:16px 0;border-bottom:1px solid var(--line);
+}
+.serv:last-child{border-bottom:0;}
+.serv .txt{flex:1 1 260px;min-width:0;}
+.serv b{display:block;font-size:16.5px;font-weight:600;color:var(--ink);margin-bottom:3px;}
+.serv .desc{font-size:14.5px;color:var(--ink-3);display:block;}
+.serv .p{
+  font-family:inherit;font-size:14px;
+  color:var(--accent);white-space:nowrap;flex:0 0 auto;
+  font-variant-numeric:tabular-nums;
+}
+
+/* sección de venta bajo la herramienta */
+.venta{margin-top:64px;padding-top:8px;border-top:1px solid var(--line);}
+.venta h2{font-size:clamp(26px,4vw,36px);font-weight:400;letter-spacing:-.025em;margin:56px 0 18px;text-shadow:0 1px 3px rgba(0,0,0,.55);}
+.venta p{color:var(--ink-2);margin:0 0 18px;}
+.venta ol{color:var(--ink-2);padding-left:22px;}
+.venta ol li{margin-bottom:10px;}
+.venta ol strong{color:var(--ink);}
+
+/* pie del sitio */
+.pie-h{border-top:1px solid var(--line);margin-top:34px;padding-block:26px 52px;}
+.pie-h .fila{display:flex;justify-content:space-between;align-items:center;gap:16px 28px;flex-wrap:wrap;}
+.pie-h .marca-h{display:inline-flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none;font-size:17px;font-weight:500;letter-spacing:-.02em;}
+.pie-h .marca-h svg{width:21px;height:21px;stroke:var(--accent);fill:none;stroke-width:1.5;}
+.pie-h nav{display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.pie-h a:not(.marca-h){color:var(--ink-3);text-decoration:none;font-size:13.5px;transition:color .2s;}
+.pie-h a:not(.marca-h):hover{color:var(--ink);}
+.pie-h .ig{display:inline-grid;place-items:center;}
+.pie-h .ig svg{width:20px;height:20px;}
+.pie-h .nota{margin:22px 0 0;font-size:12.5px;color:var(--ink-3);line-height:1.55;}
+.pie-h .nota p{margin:0 0 6px;}
+.nav .marca img{width:34px;height:34px;object-fit:contain;flex:0 0 auto;}
+img{max-width:100%;height:auto;}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://mejoratuweb.world/#web",
+      "name": "Mejora tu web",
+      "url": "https://mejoratuweb.world/",
+      "description": "Herramientas gratuitas y contenidos sobre visibilidad web para negocios pequeños.",
+      "inLanguage": "es-ES",
+      "publisher": { "@id": "https://mejoratuweb.world/#autor" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://mejoratuweb.world/#autor",
+      "name": "[TU NOMBRE]",
+      "url": "https://mejoratuweb.world/sobre-mi",
+      "sameAs": ["https://instagram.com/mejoratuweb_"]
+    },
+    {
+      "@type": "WebApplication",
+      "name": "Auditor de visibilidad",
+      "url": "https://mejoratuweb.world/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Cualquier navegador",
+      "inLanguage": "es-ES",
+      "description": "Analiza una página web y detecta qué le falta para aparecer en Google, para funcionar como negocio local, para verse bien al compartirla y para que la encuentre la inteligencia artificial.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "author": { "@id": "https://mejoratuweb.world/#autor" }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Es gratis de verdad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. No pide registro, no pide correo y no hay versión de pago. La web se mantiene con publicidad, que es lo que permite que las herramientas sean gratis."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué revisa exactamente el auditor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Unas treinta comprobaciones repartidas en cuatro bloques: lo que mira Google para posicionarte, tu presencia como negocio local, cómo se ve tu enlace cuando alguien lo comparte, y si los rastreadores de inteligencia artificial pueden leerte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Guardáis la dirección que analizo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. La página se descarga, se analiza y se devuelve el resultado. No se guarda ni la dirección ni el contenido."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué mi web saca mala nota si se ve bien?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Porque el auditor no mira si es bonita: mira si Google la entiende. Una web preciosa puede no tener descripción, ni datos estructurados, ni etiquetas para compartir, y entonces existe pero no la encuentra nadie."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Sirve para cualquier web?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Para cualquiera que se pueda descargar públicamente. El bloque de presencia local solo tiene sentido si tu negocio atiende a clientes de una zona concreta; si no, puedes ignorarlo."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<div class="barra">
+<nav class="nav">
+  <a class="marca" href="/"><img src="/img/logo.png" alt="" width="120" height="120">Mejora tu web</a>
+  <ul>
+    <li><a href="/presupuesto">Presupuesto</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><a href="/sobre-mi">Sobre mí</a></li>
+    <li><a href="/contacto">Contacto</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="wrap">
+
+<header>
+  <p class="kicker">Diagnóstico gratuito · 30 segundos</p>
+  <h1>¿Por qué tu negocio no aparece en Google?</h1>
+  <p class="sub">Revisamos tu web y te decimos exactamente qué le falta para que Google te encuentre, para que tu ficha salga bien en el móvil y para que tu enlace se vea decente cuando alguien lo comparte por WhatsApp.</p>
+</header>
+
+<div class="input-card">
+  <label for="url">¿Cuál es tu web?</label>
+  <p class="how">Escribe la dirección y pulsa el botón. Tarda unos segundos.</p>
+  <div class="url-row">
+    <span class="proto">https://</span>
+    <input type="text" id="url" inputmode="url" autocomplete="url" spellcheck="false"
+           placeholder="tunegocio.es" aria-label="Dirección de tu web">
+  </div>
+  <div class="row">
+    <button type="button" class="b-main" id="go">Analizar mi web</button>
+    <button type="button" class="b-ghost" id="demo">Ver un ejemplo real</button>
+  </div>
+  <p class="err" id="err" hidden></p>
+</div>
+
+<div class="cols">
+<div>
+
+<section class="score" aria-live="polite">
+  <div class="dial">
+    <svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-labelledby="dial-t">
+      <title id="dial-t">Puntuación de visibilidad</title>
+      <circle cx="44" cy="44" r="37" fill="none" stroke="var(--line-2)" stroke-width="9"></circle>
+      <circle id="arc" cx="44" cy="44" r="37" fill="none" stroke="var(--accent)" stroke-width="9"
+              stroke-linecap="round" stroke-dasharray="232.5" stroke-dashoffset="232.5"
+              transform="rotate(-90 44 44)"></circle>
+      <text id="arc-n" x="44" y="49" text-anchor="middle" fill="var(--ink)"
+            font-family="Poppins, sans-serif" font-size="20" font-weight="500">—</text>
+    </svg>
+  </div>
+  <div class="score-txt">
+    <h2 id="verdict">Esperando tu web</h2>
+    <p id="verdict-d">Pega el código de arriba y pulsa analizar. O mira el ejemplo si prefieres ver antes cómo funciona.</p>
+  </div>
+</section>
+
+<div id="report"></div>
+
+<section class="close" id="closing" hidden>
+  <h2 id="close-t">Lo importante son los tres primeros</h2>
+  <p id="close-d">Arreglar los fallos marcados como críticos es lo que más mueve la aguja. El resto suma, pero sin eso no hay nada que hacer.</p>
+  <div class="row">
+    <button type="button" class="b-main" id="ask">Cómo se arregla</button>
+    <button type="button" class="b-ghost" id="print">Guardar el informe</button>
+  </div>
+  <div class="note" id="sent" hidden>Cada fallo se arregla de una forma distinta. Los tres más habituales los explico paso a paso aquí: <a href="/blog/ficha-google-business">la ficha de Google Business</a>, <a href="/blog/velocidad-web">la velocidad de carga</a> y <a href="/blog/precio-web-negocio-pequeno">lo que cuesta arreglarlo</a>. Si algo no te cuadra, <a href="/contacto">escríbeme</a>.</div>
+</section>
+
+</div>
+
+<aside class="lateral">
+
+  <div class="caja">
+    <h3>Qué revisamos</h3>
+    <ul>
+      <li><b>12</b> señales que mira Google</li>
+      <li><b>6</b> de presencia local</li>
+      <li><b>3</b> de cómo se ve al compartir</li>
+      <li><b>6</b> sobre si te encuentra la IA</li>
+    </ul>
+  </div>
+
+  <div class="caja">
+    <h3>Guías relacionadas</h3>
+    <a href="/blog/ficha-google-business">La ficha de Google Business →</a>
+    <a href="/blog/velocidad-web">Por qué tu web va lenta →</a>
+    <a href="/blog/precio-web-negocio-pequeno">Lo que cuesta arreglarlo →</a>
+  </div>
+
+  <!-- ANUNCIO LATERAL — solo se ve en escritorio -->
+  <div class="ad">Hueco de anuncio</div>
+
+</aside>
+
+</div>
+
+<section class="venta">
+
+<h2>Qué más hay aquí</h2>
+
+<p>Herramientas gratis y guías para que un negocio pequeño entienda por qué no lo encuentran en internet. Sin registros, sin dejar el correo y sin que te llame nadie después.</p>
+
+<ul class="more">
+  <li><a href="/presupuesto">¿Cuánto debería costarte tu web?<span class="sub">Siete preguntas y una horquilla de precio con datos reales del mercado español. Para que sepas si el presupuesto que te han pasado es caro o barato</span></a></li>
+  <li><a href="/blog/ficha-google-business">Qué es la ficha de Google Business<span class="sub">Es gratis, sale antes que cualquier web y decide quién se lleva la llamada</span></a></li>
+  <li><a href="/blog/velocidad-web">Por qué tu web tarda en cargar<span class="sub">Cómo medirlo gratis y qué arreglar primero</span></a></li>
+  <li><a href="/blog/precio-web-negocio-pequeno">Precios de una web en 2026<span class="sub">Cuatro tipos de web, lo que sube el presupuesto y los costes anuales que nadie cuenta</span></a></li>
+  <li><a href="/blog">Todos los artículos<span class="sub">Visibilidad, precios y las herramientas que de verdad sirven</span></a></li>
+</ul>
+
+
+<h2>Preguntas frecuentes</h2>
+
+<details>
+  <summary>¿Es gratis de verdad?</summary>
+  <p>Sí. No pide registro, no pide correo y no hay versión de pago. La web se mantiene con publicidad, que es lo que permite que las herramientas sean gratis.</p>
+</details>
+<details>
+  <summary>¿Qué revisa exactamente el auditor?</summary>
+  <p>Unas treinta comprobaciones repartidas en cuatro bloques: lo que mira Google para posicionarte, tu presencia como negocio local, cómo se ve tu enlace cuando alguien lo comparte, y si los rastreadores de inteligencia artificial pueden leerte.</p>
+</details>
+<details>
+  <summary>¿Guardáis la dirección que analizo?</summary>
+  <p>No. La página se descarga, se analiza y se devuelve el resultado. No se guarda ni la dirección ni el contenido.</p>
+</details>
+<details>
+  <summary>¿Por qué mi web saca mala nota si se ve bien?</summary>
+  <p>Porque el auditor no mira si es bonita: mira si Google la entiende. Una web preciosa puede no tener descripción, ni datos estructurados, ni etiquetas para compartir, y entonces existe pero no la encuentra nadie.</p>
+</details>
+<details>
+  <summary>¿Sirve para cualquier web?</summary>
+  <p>Para cualquiera que se pueda descargar públicamente. El bloque de presencia local solo tiene sentido si tu negocio atiende a clientes de una zona concreta; si no, puedes ignorarlo.</p>
+</details>
+
+</section>
+
+<footer class="pie-h">
+  <div class="fila">
+    <a class="marca-h" href="/"><img src="/img/logo.png" alt="" width="120" height="120"><span>Mejora tu web</span></a>
+    <nav aria-label="Legal">
+      <a href="/blog">Blog</a>
+      <a href="/sobre-mi">Sobre mí</a>
+      <a href="/contacto">Contacto</a>
+      <a href="/aviso-legal">Aviso legal</a>
+      <a href="/politica-de-privacidad">Privacidad</a>
+      <a href="/politica-de-cookies">Cookies</a>
+      <a class="ig" href="https://instagram.com/mejoratuweb_" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+    </nav>
+  </div>
+  <div class="nota">
+    <p>El an&aacute;lisis descarga la p&aacute;gina que indiques y revisa su c&oacute;digo. No comprueba velocidad de carga, enlaces entrantes ni tu ficha de Google Business, que se miran aparte.</p>
+    <p>&copy; 2026 [TU NOMBRE] &middot; Herramientas y gu&iacute;as sobre visibilidad web</p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var report = $('report'), url = $('url'), err = $('err'), go = $('go');
+
+  var EJEMPLO = '<!DOCTYPE html>\n<html>\n<head>\n' +
+    '<meta charset="utf-8">\n' +
+    '<title>Inicio</title>\n' +
+    '<link rel="stylesheet" href="estilo.css">\n' +
+    '</head>\n<body>\n' +
+    '<h1>Bienvenidos</h1>\n' +
+    '<h1>Nuestra carta</h1>\n' +
+    '<img src="local.jpg">\n' +
+    '<img src="plato.jpg" alt="Arroz caldoso">\n' +
+    '<p>Somos un restaurante familiar en el centro. Llámanos al 961 234 567 ' +
+    'o ven a vernos en la Calle Mayor 14, 46001 Valencia.</p>\n' +
+    '<p>Abrimos todos los días de 13:00 a 16:00 y de 20:00 a 23:30.</p>\n' +
+    '</body>\n</html>';
+
+  // ---- comprobaciones ----
+  function analizar(d){
+    if(typeof d === 'string') d = {html:d};
+    var html = d.html;
+    var robots = d.robots || '';
+    var haySitemap = !!d.sitemap;
+    var hayLlms = !!d.llms;
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var head = doc.head || doc.createElement('head');
+    var txt = (doc.body ? doc.body.textContent : '').replace(/\s+/g,' ').trim();
+    var raw = html;
+
+    function meta(sel){ var e = head.querySelector(sel); return e ? (e.getAttribute('content')||'').trim() : null; }
+
+    var titulo = (doc.querySelector('title')||{}).textContent;
+    titulo = titulo ? titulo.trim() : '';
+    var desc = meta('meta[name="description" i]');
+    var h1s = doc.querySelectorAll('h1');
+    var imgs = doc.querySelectorAll('img');
+    // alt="" es correcto: marca una imagen decorativa. Lo que falla
+    // es no tener el atributo en absoluto.
+    var sinAlt = 0, decorativas = 0;
+    Array.prototype.forEach.call(imgs, function(i){
+      if(!i.hasAttribute('alt')) sinAlt++;
+      else if(!i.getAttribute('alt').trim()) decorativas++;
+    });
+    var lang = doc.documentElement.getAttribute('lang');
+    var robots = (meta('meta[name="robots" i]')||'').toLowerCase();
+    var canonical = head.querySelector('link[rel="canonical" i]');
+    var viewport = meta('meta[name="viewport" i]');
+    var favicon = head.querySelector('link[rel~="icon" i]');
+
+    var ogT = meta('meta[property="og:title" i]'), ogD = meta('meta[property="og:description" i]'),
+        ogI = meta('meta[property="og:image" i]');
+
+    var schema = /"@type"\s*:\s*"(LocalBusiness|Restaurant|Store|Dentist|MedicalClinic|HealthAndBeautyBusiness|AutoRepair|ProfessionalService|BarOrPub|CafeOrCoffeeShop)"/i.test(raw);
+    var tel = /href\s*=\s*["']tel:/i.test(raw);
+    var wa = /(wa\.me|api\.whatsapp\.com)/i.test(raw);
+    var cp = /\b\d{5}\b/.test(txt);
+    var horario = /(horario|abrimos|abierto|lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)/i.test(txt)
+                  && /\d{1,2}[:.]\d{2}/.test(txt);
+    var mapa = /(google\.com\/maps|maps\.google|maps\.app\.goo\.gl)/i.test(raw);
+
+    var B = [], L = [], C = [];
+
+    // --- básicos ---
+    if(!titulo) B.push(f('bad','Tu página no tiene título','Es el renglón azul que sale en Google. Sin él, Google se inventa uno.',true));
+    else if(titulo.length < 15) B.push(f('warn','El título es demasiado corto','Pone <code>'+esc(titulo)+'</code>. Debería incluir qué eres y dónde estás: «Restaurante El Puerto · Arrocería en Valencia».'));
+    else if(titulo.length > 65) B.push(f('warn','El título se va a cortar en Google','Tiene '+titulo.length+' caracteres y se corta sobre los 60.'));
+    else B.push(f('ok','Título correcto','<code>'+esc(titulo)+'</code>'));
+
+    if(!desc) B.push(f('bad','Falta la descripción','Es el texto gris bajo el título en Google. Sin ella, Google recorta un trozo cualquiera de tu web.',true));
+    else if(desc.length < 70) B.push(f('warn','La descripción se queda corta','Tiene '+desc.length+' caracteres. Entre 120 y 160 aprovecha todo el espacio.'));
+    else B.push(f('ok','Descripción correcta',desc.length+' caracteres.'));
+
+    if(h1s.length === 0) B.push(f('bad','No hay titular principal','Falta el <code>&lt;h1&gt;</code>. Es como Google entiende de qué va la página.',true));
+    else if(h1s.length > 1) B.push(f('warn','Hay '+h1s.length+' titulares principales','Solo debe haber un <code>&lt;h1&gt;</code>. Los demás deberían ser <code>&lt;h2&gt;</code>.'));
+    else B.push(f('ok','Un solo titular principal','<code>'+esc(h1s[0].textContent.trim().slice(0,60))+'</code>'));
+
+    if(robots.indexOf('noindex') > -1)
+      B.push(f('bad','Le estás diciendo a Google que no te indexe','Hay un <code>noindex</code> en el código. Esto por sí solo te borra de Google. Suele quedarse puesto sin querer al publicar.',true));
+
+    if(!lang) B.push(f('warn','No declaras el idioma','Falta <code>lang="es"</code> en la etiqueta <code>&lt;html&gt;</code>.'));
+    else B.push(f('ok','Idioma declarado','<code>'+esc(lang)+'</code>'));
+
+    if(!viewport) B.push(f('bad','No está preparada para móvil','Falta la etiqueta <code>viewport</code>. La mayoría de tus clientes te busca desde el móvil.',true));
+    else B.push(f('ok','Preparada para móvil',''));
+
+    if(sinAlt > 0) B.push(f('warn', sinAlt+' '+(sinAlt===1?'imagen sin descripción':'imágenes sin descripción'),'Sin <code>alt</code>, Google no sabe qué hay en la foto y no salen en Google Imágenes.'));
+    else if(imgs.length) B.push(f('ok','Todas las imágenes descritas',
+      imgs.length + ' con <code>alt</code>' + (decorativas ? ', ' + decorativas + ' marcadas como decorativas' : '') + '.'));
+
+    if(!canonical) B.push(f('warn','Falta la etiqueta canonical','Evita que Google vea varias versiones de la misma página.'));
+    if(!favicon) B.push(f('warn','No tienes icono de pestaña','El cuadradito que sale en la pestaña y en los marcadores.'));
+
+    var pal = txt ? txt.split(' ').length : 0;
+    if(pal < 150) B.push(f('bad','Casi no hay texto','Unas '+pal+' palabras. Google necesita texto para saber de qué va tu negocio y para quién.',true));
+    else if(pal < 350) B.push(f('warn','Hay poco texto','Unas '+pal+' palabras. Con 400 o 500 bien escritas competirías mucho mejor.'));
+    else B.push(f('ok','Cantidad de texto suficiente','Unas '+pal+' palabras.'));
+
+    // jerarquía de titulares
+    var h2s = doc.querySelectorAll('h2');
+    if(h1s.length && h2s.length === 0 && pal > 400)
+      B.push(f('warn','No hay subtítulos','Solo hay un titular y mucho texto seguido. Los <code>&lt;h2&gt;</code> ayudan a Google a entender de qué habla cada parte, y al lector a no perderse.'));
+    else if(h2s.length) B.push(f('ok','Texto bien estructurado', h2s.length + ' ' + (h2s.length===1?'subtítulo':'subtítulos') + '.'));
+
+    // enlaces internos
+    // El host es el de la web analizada, no el de esta página.
+    var suHost = '';
+    try { suHost = d.url ? new URL(d.url).host : ''; } catch(e){}
+
+    var internos = 0;
+    Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function(a){
+      var h = (a.getAttribute('href') || '').trim();
+      if(!h || h.charAt(0) === '#') return;
+      if(/^(mailto:|tel:|javascript:|data:)/i.test(h)) return;
+      if(/^https?:\/\//i.test(h)){
+        if(suHost && h.indexOf(suHost) > -1) internos++;   // absoluto, pero suyo
+      } else {
+        internos++;                                         // relativo: siempre interno
+      }
+    });
+    if(internos < 3) B.push(f('warn','Casi no hay enlaces entre tus páginas','Solo ' + internos + '. Enlazar tus propias páginas entre sí reparte autoridad y hace que la gente vea más de una.'));
+    else B.push(f('ok','Páginas enlazadas entre sí', internos + ' enlaces internos.'));
+
+    // robots.txt y sitemap
+    if(robots){
+      if(/User-agent:\s*\*[\s\S]*?Disallow:\s*\/\s*$/im.test(robots))
+        B.push(f('bad','Tu robots.txt bloquea todo Google','Hay un <code>Disallow: /</code> general. Esto por sí solo te borra del buscador.',true));
+      else B.push(f('ok','robots.txt correcto','No bloquea el rastreo.'));
+    } else {
+      B.push(f('warn','No tienes robots.txt','No es grave, pero es donde se indica dónde está tu sitemap y qué rastreadores pueden entrar.'));
+    }
+
+    if(haySitemap) B.push(f('ok','Sitemap publicado','Google tiene el mapa de tu web.'));
+    else B.push(f('warn','No encuentro el sitemap','Un <code>sitemap.xml</code> le dice a Google todas tus páginas de golpe. Sin él tarda más en descubrirlas.'));
+
+    // --- local ---
+    // ¿Esto parece siquiera un negocio local? Sin schema, sin teléfono,
+    // sin dirección y sin horarios, casi seguro que no lo es. En ese caso
+    // avisamos, pero no lo marcamos como crítico: sería una falsa alarma.
+    var pareceLocal = schema || tel || cp || horario || mapa;
+
+    if(!pareceLocal){
+      L.push(f('warn','Esto no parece un negocio local',
+        'No encuentro dirección, teléfono ni horarios. Si tu web no es la de un negocio con clientes de una zona concreta, este bloque no te aplica y puedes ignorarlo entero.'));
+    }
+
+    if(!schema) L.push(f(pareceLocal ? 'bad' : 'warn','Google no sabe que eres un negocio','Falta el marcado de negocio local. Es lo que hace que salga tu tarjeta con teléfono, horario y valoraciones en vez de un resultado a secas. Casi ninguna web pequeña lo tiene, y es lo que más diferencia.', pareceLocal));
+    else L.push(f('ok','Marcado de negocio local presente',''));
+
+    if(!tel) L.push(f(pareceLocal ? 'bad' : 'warn','El teléfono no se puede pulsar','Debe ser un enlace <code>tel:</code>. Desde el móvil, un número que no llama solo es un número que nadie marca.', pareceLocal));
+    else L.push(f('ok','Teléfono pulsable',''));
+
+    if(!cp) L.push(f('warn','No encuentro una dirección completa','Falta el código postal. La dirección exacta ayuda a Google a situarte en el mapa.'));
+    else L.push(f('ok','Dirección con código postal',''));
+
+    if(!horario) L.push(f('warn','No aparecen los horarios','Es de lo que más se busca de un negocio local, y Google lo muestra directamente si lo encuentra.'));
+    else L.push(f('ok','Horarios publicados',''));
+
+    if(!mapa) L.push(f('warn','No hay mapa','Un mapa incrustado o un enlace a tu ficha de Google Maps ayuda al cliente y refuerza tu ubicación.'));
+    else L.push(f('ok','Mapa enlazado',''));
+
+    if(!wa) L.push(f('warn','No hay enlace de WhatsApp','En negocio local convierte más que cualquier formulario de contacto.'));
+    else L.push(f('ok','WhatsApp enlazado',''));
+
+    // --- compartir ---
+    if(!ogT && !ogD && !ogI)
+      C.push(f('bad','Tu enlace se ve roto al compartirlo','Faltan todas las etiquetas Open Graph. Cuando alguien pega tu web en WhatsApp o en Instagram, sale un rectángulo gris sin foto ni texto.',true));
+    else {
+      if(!ogT) C.push(f('warn','Falta el título al compartir','<code>og:title</code>'));
+      else C.push(f('ok','Título al compartir',''));
+      if(!ogI) C.push(f('bad','No hay imagen al compartir','<code>og:image</code>. Es lo que más se nota: sin foto, casi nadie pincha.',true));
+      else C.push(f('ok','Imagen al compartir',''));
+      if(!ogD) C.push(f('warn','Falta la descripción al compartir','<code>og:description</code>'));
+      else C.push(f('ok','Descripción al compartir',''));
+    }
+
+    // --- ¿te encuentra la IA? ---
+    var A = [];
+
+    var bloqueaIA = /User-agent:\s*(GPTBot|ClaudeBot|Claude-Web|PerplexityBot|Google-Extended|CCBot|anthropic-ai)[\s\S]{0,200}?Disallow:\s*\//i.test(robots);
+    if(bloqueaIA) A.push(f('bad','Le has cerrado la puerta a la IA','Tu <code>robots.txt</code> bloquea a rastreadores como GPTBot, ClaudeBot o Perplexity. Si alguien pregunta por tu sector a ChatGPT, tu negocio no puede salir.',true));
+    else A.push(f('ok','Las IAs pueden leerte','Ningún rastreador de IA está bloqueado.'));
+
+    var tieneDatos = /"@type"\s*:\s*"[A-Za-z]+"/.test(raw);
+    if(!tieneDatos) A.push(f('bad','No hay datos estructurados','Es la ficha en código que dice qué eres, dónde estás y a qué te dedicas. Es lo que leen las IAs para citarte con datos correctos en vez de inventárselos.',true));
+    else A.push(f('ok','Datos estructurados presentes',''));
+
+    var preguntas = 0;
+    Array.prototype.forEach.call(doc.querySelectorAll('h2,h3'), function(h){
+      var t = (h.textContent||'').trim();
+      if(/\?|^(qué|que|cómo|como|cuánto|cuanto|cuándo|cuando|por qué|porque|dónde|donde|quién|quien)\b/i.test(t)) preguntas++;
+    });
+    if(preguntas === 0) A.push(f('warn','Tus títulos no responden preguntas','Las IAs citan el contenido que responde a algo concreto. Un apartado que se llame «¿Cuánto cuesta…?» tiene muchas más papeletas que uno que ponga «Servicios».'));
+    else A.push(f('ok','Contenido en forma de respuesta', preguntas + ' ' + (preguntas===1?'apartado responde':'apartados responden') + ' a una pregunta.'));
+
+    var faq = /"@type"\s*:\s*"(FAQPage|Question)"/i.test(raw);
+    if(!faq) A.push(f('warn','Sin apartado de preguntas frecuentes marcado','Un bloque de preguntas y respuestas con su marcado es de lo que más se cita, tanto en Google como en las IAs.'));
+    else A.push(f('ok','Preguntas frecuentes marcadas',''));
+
+    var autor = /"@type"\s*:\s*"Person"/i.test(raw) || /rel=["']author/i.test(raw) || /itemprop=["']author/i.test(raw);
+    if(!autor) A.push(f('warn','No se sabe quién escribe','Poner quién hay detrás —nombre y experiencia— es una de las señales de confianza que más pesan, para Google y para la IA.'));
+    else A.push(f('ok','Autoría identificada',''));
+
+    if(hayLlms) A.push(f('ok','Tienes llms.txt','Vas por delante: ese archivo le explica a las IAs qué hay en tu web.'));
+    else A.push(f('warn','No tienes llms.txt','Es un archivo nuevo, todavía opcional, que resume tu web para las IAs. Casi nadie lo tiene: ponerlo te distingue.'));
+
+    return [
+      {t:'Lo que mira Google', items:B},
+      {t:'Tu presencia como negocio local', items:L},
+      {t:'Cuando alguien comparte tu enlace', items:C},
+      {t:'¿Te encuentra la inteligencia artificial?', items:A}
+    ];
+  }
+
+  function f(nivel,titulo,detalle,critico){
+    return {nivel:nivel, t:titulo, d:detalle||'', crit:!!critico};
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+
+  function pintar(bloques){
+    report.innerHTML = '';
+    var bad=0, warn=0, ok=0;
+
+    bloques.forEach(function(b){
+      var nb=0,nw=0,no=0;
+      b.items.forEach(function(i){
+        if(i.nivel==='bad'){bad++;nb++;} else if(i.nivel==='warn'){warn++;nw++;} else {ok++;no++;}
+      });
+
+      var sec = document.createElement('section');
+      sec.className = 'block';
+      var head = document.createElement('div');
+      head.className = 'block-head';
+      var h3 = document.createElement('h3'); h3.textContent = b.t;
+      var tally = document.createElement('span'); tally.className = 'tally';
+      // Cada bloque saca su propia nota: bien vale 1, mejorable medio, crítico 0.
+      var totalB = nb + nw + no;
+      var pctB = totalB ? Math.round(((no + nw*0.5) / totalB) * 100) : 100;
+      tally.textContent = pctB + '%  ·  ' + nb + ' críticos · ' + nw + ' mejorables · ' + no + ' bien';
+      tally.style.color = pctB < 50 ? 'var(--bad)' : pctB < 80 ? 'var(--warn)' : 'var(--ok)';
+      head.appendChild(h3); head.appendChild(tally);
+
+      var ul = document.createElement('ul'); ul.className = 'items';
+      b.items.sort(function(x,y){
+        var o = {bad:0,warn:1,ok:2};
+        return o[x.nivel]-o[y.nivel];
+      }).forEach(function(i){
+        var li = document.createElement('li'); li.className = 'item';
+        var m = document.createElement('span');
+        m.className = 'mark m-'+i.nivel;
+        m.textContent = i.nivel==='bad' ? '!' : (i.nivel==='warn' ? '~' : '✓');
+        m.setAttribute('aria-label', i.nivel==='bad'?'Crítico':(i.nivel==='warn'?'Mejorable':'Correcto'));
+        var body = document.createElement('div'); body.className='item-body';
+        var t = document.createElement('p'); t.className='item-t';
+        t.textContent = i.t;
+        if(i.crit){ var c=document.createElement('span'); c.className='crit'; c.textContent='crítico'; t.appendChild(c); }
+        body.appendChild(t);
+        if(i.d){ var d=document.createElement('p'); d.className='item-d'; d.innerHTML=i.d; body.appendChild(d); }
+        li.appendChild(m); li.appendChild(body);
+        ul.appendChild(li);
+      });
+
+      sec.appendChild(head); sec.appendChild(ul);
+      report.appendChild(sec);
+    });
+
+    marcador(bad,warn,ok);
+    $('closing').hidden = false;
+  }
+
+  function marcador(bad,warn,ok){
+    var total = bad+warn+ok;
+    var pts = Math.round(((ok + warn*0.4) / total) * 100);
+    var arc = $('arc'), C = 2*Math.PI*37;
+    arc.setAttribute('stroke-dashoffset', String(C - (C*pts/100)));
+    arc.setAttribute('stroke', pts<40 ? 'var(--bad)' : pts<70 ? 'var(--warn)' : 'var(--ok)');
+    $('arc-n').textContent = pts;
+
+    var v = $('verdict'), d = $('verdict-d');
+    if(bad === 0 && warn <= 2){
+      v.textContent = 'Tu web está bien montada';
+      d.textContent = 'No hay fallos críticos. Lo que queda son mejoras finas que suman poco a poco.';
+    } else if(bad === 0){
+      v.textContent = 'Nada roto, pero le falta rematar';
+      d.textContent = warn + ' cosas mejorables. Ninguna te está borrando de Google, pero juntas te dejan por detrás de quien sí las tiene.';
+    } else if(bad <= 2){
+      v.textContent = bad + (bad===1?' fallo crítico':' fallos críticos');
+      d.textContent = 'Son pocos, pero de los que pesan. Arreglados, tu web pasa a jugar en otra liga.';
+    } else {
+      v.textContent = bad + ' fallos críticos';
+      d.textContent = 'Por esto no apareces. La buena noticia es que casi todos se arreglan en una tarde, no requieren rehacer nada.';
+    }
+    $('close-t').textContent = bad > 0 ? 'Empieza por los críticos' : 'Vas bien, remata lo que falta';
+    $('close-d').textContent = bad === 0
+      ? 'No hay nada crítico. Lo que queda son mejoras que suman, y puedes ir haciéndolas con calma.'
+      : (bad === 1
+          ? 'Ese fallo crítico es el que más mueve la aguja. Arréglalo primero y luego ya miras el resto.'
+          : 'Arreglar los ' + bad + ' fallos críticos es lo que más mueve la aguja. El resto suma, pero sin eso no hay nada que hacer.');
+  }
+
+  function fallo(msg){
+    err.textContent = msg; err.hidden = false;
+    go.disabled = false; go.textContent = 'Analizar mi web';
+  }
+
+  function auditar(){
+    var v = url.value.trim().replace(/^https?:\/\//i, '');
+    if(!v){ fallo('Escribe la dirección de tu web.'); url.focus(); return; }
+
+    err.hidden = true;
+    go.disabled = true; go.textContent = 'Analizando\u2026';
+
+    fetch('/api/auditar?url=' + encodeURIComponent(v))
+      .then(function(r){ return r.json().then(function(d){
+        if(!r.ok) throw new Error(d.error || 'No se ha podido analizar esa web.');
+        return d;
+      }); })
+      .then(function(d){
+        pintar(analizar(d));
+        go.disabled = false; go.textContent = 'Analizar otra vez';
+        document.querySelector('.score').scrollIntoView({behavior:'smooth',block:'start'});
+      })
+      .catch(function(e){ fallo(e.message); });
+  }
+
+  go.addEventListener('click', auditar);
+  url.addEventListener('keydown', function(e){ if(e.key === 'Enter') auditar(); });
+
+  // Si pegan la dirección entera, quitamos el protocolo: ya lo pone la etiqueta de al lado.
+  url.addEventListener('input', function(){
+    if(/^https?:\/\//i.test(url.value)) url.value = url.value.replace(/^https?:\/\//i, '');
+  });
+
+  $('demo').addEventListener('click', function(){
+    err.hidden = true;
+    pintar(analizar(EJEMPLO));
+    document.querySelector('.score').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  $('ask').addEventListener('click', function(){
+    var s = $('sent'); s.hidden = false; s.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+  $('print').addEventListener('click', function(){ window.print(); });
+
+  // arranca mostrando el ejemplo, para que se vea qué hace
+  pintar(analizar(EJEMPLO));
+})();
+</script>
+
+<script src="/ambiente.js" defer></script>
+
+</body>
+</html>

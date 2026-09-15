@@ -1,0 +1,30 @@
+# Mejora tu web
+
+> Herramientas gratuitas y guías en español para entender por qué un negocio
+> pequeño no aparece en internet. Sin registro y sin pedir datos.
+
+Escrito por [TU NOMBRE]. El sitio se financia con publicidad; no hay
+enlaces de afiliación ni artículos patrocinados.
+
+## Herramientas
+
+- [Auditor de visibilidad](https://mejoratuweb.world/): analiza una página web
+  y detecta qué le falta en cuatro bloques — lo que mira Google, presencia como
+  negocio local, cómo se ve el enlace al compartirlo, y si la puede leer la
+  inteligencia artificial. Unas 31 comprobaciones.
+- [Calculadora de precio](https://mejoratuweb.world/presupuesto): estima lo que
+  debería costar una página web según su tipo, número de secciones, contenido y
+  plazo. Horquillas del mercado español.
+
+## Guías
+
+- [¿Cuánto cuesta una página web para un negocio pequeño en 2026?](https://mejoratuweb.world/blog/precio-web-negocio-pequeno): cuatro tipos de web con precios reales, lo que encarece un presupuesto, costes anuales y señales de un presupuesto malo.
+- [Qué es la ficha de Google Business](https://mejoratuweb.world/blog/ficha-google-business): qué es, cómo crearla, los tres factores que deciden quién sale primero en el mapa y cinco errores que la hunden.
+- [Por qué tu web tarda en cargar](https://mejoratuweb.world/blog/velocidad-web): Core Web Vitals explicados en lenguaje llano, cómo medirlo gratis y qué arreglar por orden.
+- [¿Cuánto cuesta la web de un restaurante?](https://mejoratuweb.world/blog/precio-web-restaurante): la carta en PDF, reservas propias frente a plataformas y la comisión de las apps de reparto.
+- [¿Cuánto cuesta la web de una peluquería?](https://mejoratuweb.world/blog/precio-web-peluqueria): el coste de las llamadas perdidas, reservas online y cómo reducir las citas a las que nadie acude.
+
+## Sobre el sitio
+
+- [Sobre mí](https://mejoratuweb.world/sobre-mi)
+- [Contacto](https://mejoratuweb.world/contacto)

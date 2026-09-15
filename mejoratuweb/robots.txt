@@ -1,0 +1,9 @@
+# Que pasen todos los buscadores por todo el sitio.
+User-agent: *
+Allow: /
+
+# Dejamos fuera lo que no aporta nada en Google.
+Disallow: /api/
+Disallow: /gracias
+
+Sitemap: https://mejoratuweb.world/sitemap.xml

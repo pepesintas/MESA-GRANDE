@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuánto cuesta tu web?</title>
+<meta name="description" content="Calcula lo que costaría tu página web en un minuto. Siete preguntas y un presupuesto desglosado con precios reales del mercado español.">
+<link rel="canonical" href="https://mejoratuweb.world/presupuesto">
+<link rel="icon" href="/img/logo.png">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mejoratuweb.world/presupuesto">
+<meta property="og:title" content="¿Cuánto costaría tu página web?">
+<meta property="og:description" content="Siete preguntas y un presupuesto desglosado, sin dejar el correo.">
+<meta property="og:image" content="https://mejoratuweb.world/img/portada-presupuesto.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
+
+<link rel="stylesheet" href="/estilo.css">
+
+<style>
+:root{
+  color-scheme: light;
+  --paper:#EAE3DE;
+  --card:rgba(255,255,255,.45);
+  --ink:#175A67;
+  --ink-soft:#2A707C;
+  --line:rgba(23,90,103,.18);
+  --line-strong:rgba(23,90,103,.34);
+  --green:#175A67;
+  --green-soft:#175A67;
+  --green-ink:#EAE3DE;
+  --brass:#175A67;
+  --brass-soft:rgba(23,90,103,.07);
+  --shadow:none;
+  --radius:10px;
+}
+
+
+
+*{box-sizing:border-box;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Poppins', "Helvetica Neue", Arial, sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  margin:0;
+  padding-block:0 0;
+  padding-left:20px;
+  padding-right:20px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding-inline:clamp(1.25rem,4vw,4.5rem);}
+
+/* ---------- cabecera ---------- */
+header{padding-block:56px 32px;}
+.eyebrow{
+  font-family:inherit;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 14px;
+}
+h1{
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:400;font-size:clamp(36px,6.5vw,54px);line-height:1.05;letter-spacing:-.035em;
+  letter-spacing:-.015em;margin:0 0 14px;text-wrap:balance;
+}
+.lede{font-size:17px;color:var(--ink-soft);margin:0;max-width:56ch;}
+
+/* ---------- formulario ---------- */
+form{display:flex;flex-direction:column;gap:26px;margin-block:8px 36px;}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
+legend{
+  font-weight:700;font-size:15px;padding:0;margin-bottom:2px;
+  display:flex;gap:9px;align-items:baseline;
+}
+.num{
+  font-family:inherit;font-size:11px;font-weight:500;
+  color:var(--green);letter-spacing:.06em;
+}
+.hint{font-size:13.5px;color:var(--ink-soft);margin:-4px 0 2px;}
+
+.opts{display:flex;flex-wrap:wrap;gap:8px;}
+.opt{position:relative;}
+.opt input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+.opt span{
+  display:block;padding:9px 14px;border:1px solid var(--line-strong);
+  border-radius:999px;background:var(--card);font-size:14.5px;
+  cursor:pointer;transition:background .13s, border-color .13s, color .13s;
+  user-select:none;
+}
+.opt input:checked + span{
+  background:var(--green-soft);border-color:var(--green);color:var(--green-ink);font-weight:600;
+}
+.opt input:focus-visible + span{outline:2px solid var(--green);outline-offset:2px;}
+.opt:hover span{border-color:var(--green);}
+
+/* ---------- presupuesto ---------- */
+.quote{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  overflow:hidden;margin-bottom:28px;
+}
+.quote-head{
+  padding:18px 22px 16px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.quote-head h2{
+  font-family:inherit;font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0;
+}
+.quote-ref{
+  font-family:inherit;font-size:11px;color:var(--ink-soft);
+}
+.lines{padding:6px 22px 4px;}
+.line{
+  display:flex;justify-content:space-between;gap:16px;align-items:baseline;
+  padding:11px 0;border-bottom:1px solid var(--line);
+}
+.line:last-child{border-bottom:0;}
+.line-name{font-size:14.5px;}
+.line-name small{display:block;color:var(--ink-soft);font-size:12.5px;line-height:1.35;}
+.line-amt{
+  font-family:inherit;font-size:13.5px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.total{
+  display:flex;justify-content:space-between;gap:16px;align-items:baseline;
+  padding:16px 22px;border-top:2px solid var(--ink);background:var(--green-soft);
+}
+.total-label{font-weight:700;font-size:15px;}
+.total-amt{
+  font-family:inherit;font-weight:600;
+  font-size:clamp(19px,4.2vw,25px);color:var(--green-ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.upkeep{
+  padding:12px 22px;display:flex;justify-content:space-between;gap:16px;
+  align-items:baseline;font-size:13.5px;color:var(--ink-soft);
+  border-top:1px solid var(--line);
+}
+.upkeep span:last-child{font-family:inherit;font-variant-numeric:tabular-nums;}
+
+/* ---------- explicación ---------- */
+.driver{
+  border-left:3px solid var(--brass);background:var(--brass-soft);
+  padding:15px 18px;border-radius:0 8px 8px 0;margin-bottom:30px;
+}
+.driver h3{
+  font-size:13px;margin:0 0 6px;letter-spacing:.02em;
+  font-weight:700;color:var(--brass);
+}
+.driver p{margin:0;font-size:14.5px;line-height:1.5;}
+
+/* ---------- cta ---------- */
+.cta{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 24px;margin-bottom:26px;
+}
+.cta h2{font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:22px;margin:0 0 8px;}
+.cta p{margin:0 0 18px;color:var(--ink-soft);font-size:15px;max-width:52ch;}
+.actions{display:flex;flex-wrap:wrap;gap:10px;}
+.btn{
+  font-family:inherit;font-size:15px;font-weight:600;border-radius:8px;
+  padding:12px 20px;cursor:pointer;border:1px solid transparent;
+  transition:opacity .13s, background .13s;
+}
+.btn-main{background:var(--green);color:var(--card);}
+.btn-main:hover{opacity:.88;}
+.btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--green);color:var(--green-ink);}
+.btn:focus-visible{outline:2px solid var(--green);outline-offset:2px;}
+
+.sent{
+  margin-top:16px;padding:13px 16px;border-radius:8px;
+  background:var(--green-soft);color:var(--green-ink);font-size:14.5px;
+  border:1px solid var(--green);
+}
+[hidden]{display:none !important;}
+
+footer{
+  padding-block:6px 52px;color:var(--ink-soft);font-size:13px;
+  border-top:1px solid var(--line);margin-top:8px;padding-top:18px;
+}
+footer p{margin:0 0 6px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important;}
+}
+@media (max-width:430px){
+  header{padding-block:38px 24px;}
+  .lines,.quote-head,.total,.upkeep{padding-left:16px;padding-right:16px;}
+  .cta{padding:22px 18px;}
+}
+
+/* pie del sitio */
+.pie-h{border-top:1px solid var(--line);margin-top:34px;padding-block:26px 52px;}
+.pie-h .fila{display:flex;justify-content:space-between;align-items:center;gap:16px 28px;flex-wrap:wrap;}
+.pie-h .marca-h{display:inline-flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none;font-size:17px;font-weight:500;letter-spacing:-.02em;}
+.pie-h .marca-h svg{width:21px;height:21px;stroke:var(--brass);fill:none;stroke-width:1.5;}
+.pie-h nav{display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.pie-h a:not(.marca-h){color:var(--ink-soft);text-decoration:none;font-size:13.5px;transition:color .2s;}
+.pie-h a:not(.marca-h):hover{color:var(--ink);}
+.pie-h .ig{display:inline-grid;place-items:center;}
+.pie-h .ig svg{width:20px;height:20px;}
+.pie-h .nota{margin:22px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.55;}
+.pie-h .nota p{margin:0 0 6px;}
+.nav .marca img{width:34px;height:34px;object-fit:contain;flex:0 0 auto;}
+img{max-width:100%;height:auto;}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Mejora tu web",
+  "description": "Herramientas gratuitas y contenidos sobre visibilidad web para negocios pequeños.",
+  "url": "https://mejoratuweb.world/",
+  "areaServed": { "@type": "Place", "name": "[TU ZONA]" },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "[TU LOCALIDAD]",
+    "postalCode": "[CP]",
+    "addressCountry": "ES"
+  },
+  "founder": { "@type": "Person", "name": "[TU NOMBRE]" },
+  "sameAs": ["https://instagram.com/mejoratuweb_"],
+  "email": "[EMAIL]"
+}
+</script>
+</head>
+<body>
+<div class="barra">
+<nav class="nav">
+  <a class="marca" href="/"><img src="/img/logo.png" alt="" width="120" height="120">Mejora tu web</a>
+  <ul>
+    <li><a href="/presupuesto" aria-current="page">Presupuesto</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><a href="/sobre-mi">Sobre mí</a></li>
+    <li><a href="/contacto">Contacto</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Estimación sin compromiso</p>
+  <h1>¿Cuánto cuesta la web de tu negocio?</h1>
+  <p class="lede">Responde siete preguntas y verás un presupuesto orientativo desglosado, con el detalle de qué encarece cada parte. Sin dejar tu correo y sin que te llame nadie.</p>
+</header>
+
+<form id="calc">
+
+  <fieldset>
+    <legend><span class="num">01</span> ¿Qué tipo de negocio tienes?</legend>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="sector" id="sector-host" value="hosteleria" checked><span>Bar o restaurante</span></label>
+      <label class="opt"><input type="radio" name="sector" id="sector-salud" value="salud"><span>Clínica o consulta</span></label>
+      <label class="opt"><input type="radio" name="sector" id="sector-tienda" value="tienda"><span>Tienda física</span></label>
+      <label class="opt"><input type="radio" name="sector" id="sector-oficio" value="oficio"><span>Taller u oficio</span></label>
+      <label class="opt"><input type="radio" name="sector" id="sector-serv" value="servicios"><span>Servicios profesionales</span></label>
+      <label class="opt"><input type="radio" name="sector" id="sector-otro" value="otro"><span>Otro</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">02</span> ¿Qué necesitas que haga la web?</legend>
+    <p class="hint">Marca todo lo que te haga falta. Es lo que más mueve el precio.</p>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" name="need" id="need-google" value="google" checked><span>Que me encuentren en Google</span></label>
+      <label class="opt"><input type="checkbox" name="need" id="need-catalogo" value="catalogo" checked><span>Enseñar mi carta o mis servicios</span></label>
+      <label class="opt"><input type="checkbox" name="need" id="need-reservas" value="reservas"><span>Que me reserven cita online</span></label>
+      <label class="opt"><input type="checkbox" name="need" id="need-tienda" value="tienda"><span>Vender por internet</span></label>
+      <label class="opt"><input type="checkbox" name="need" id="need-leads" value="leads"><span>Recibir contactos y presupuestos</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">03</span> ¿Cuántas secciones necesitas?</legend>
+    <p class="hint">Inicio, servicios, sobre nosotros, contacto… cada una cuenta como sección.</p>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="pages" id="pages-1" value="1"><span>Solo una página</span></label>
+      <label class="opt"><input type="radio" name="pages" id="pages-5" value="5" checked><span>Entre 3 y 5</span></label>
+      <label class="opt"><input type="radio" name="pages" id="pages-10" value="10"><span>Entre 6 y 10</span></label>
+      <label class="opt"><input type="radio" name="pages" id="pages-mas" value="mas"><span>Más de 10</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">04</span> ¿Tienes ya los textos y las fotos?</legend>
+    <p class="hint">Aquí es donde casi todo el mundo se lleva una sorpresa.</p>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="content" id="content-todo" value="todo"><span>Sí, lo tengo todo</span></label>
+      <label class="opt"><input type="radio" name="content" id="content-algo" value="algo" checked><span>Tengo algo suelto</span></label>
+      <label class="opt"><input type="radio" name="content" id="content-nada" value="nada"><span>No tengo nada</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">05</span> ¿Quieres poder cambiarla tú mismo?</legend>
+    <p class="hint">Actualizar la carta, subir fotos o cambiar precios sin llamar a nadie.</p>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="cms" id="cms-si" value="si" checked><span>Sí, quiero editarla yo</span></label>
+      <label class="opt"><input type="radio" name="cms" id="cms-no" value="no"><span>No hace falta</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">06</span> ¿Tienes web ahora mismo?</legend>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="current" id="cur-no" value="no" checked><span>No tengo</span></label>
+      <label class="opt"><input type="radio" name="current" id="cur-vieja" value="vieja"><span>Tengo una antigua</span></label>
+      <label class="opt"><input type="radio" name="current" id="cur-rehacer" value="rehacer"><span>Tengo una y quiero rehacerla</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="num">07</span> ¿Para cuándo la necesitas?</legend>
+    <div class="opts" role="radiogroup">
+      <label class="opt"><input type="radio" name="when" id="when-urg" value="urgente"><span>Cuanto antes</span></label>
+      <label class="opt"><input type="radio" name="when" id="when-pronto" value="pronto" checked><span>En uno o dos meses</span></label>
+      <label class="opt"><input type="radio" name="when" id="when-calma" value="calma"><span>Sin prisa</span></label>
+    </div>
+  </fieldset>
+
+</form>
+
+<section class="quote" aria-live="polite">
+  <div class="quote-head">
+    <h2>Presupuesto orientativo</h2>
+    <span class="quote-ref" id="ref">—</span>
+  </div>
+  <div class="lines" id="lines"></div>
+  <div class="total">
+    <span class="total-label">Total orientativo</span>
+    <span class="total-amt" id="total">—</span>
+  </div>
+  <div class="upkeep">
+    <span>Mantenimiento, hosting y dominio</span>
+    <span id="upkeep">—</span>
+  </div>
+</section>
+
+<div class="driver">
+  <h3>QUÉ ENCARECE TU PRESUPUESTO</h3>
+  <p id="driver-text">—</p>
+</div>
+
+<section class="cta">
+  <h2>Esto es una estimación, no un presupuesto</h2>
+  <p>El precio real depende de detalles que no caben en siete preguntas. Si quieres una cifra cerrada, la miro y te la envío por escrito en 24 horas. Gratis y sin compromiso.</p>
+  <div class="actions">
+    <button type="button" class="btn btn-main" id="ask">Quiero el presupuesto real</button>
+    <button type="button" class="btn btn-ghost" id="print">Guardar esta estimación</button>
+  </div>
+  <div class="sent" id="sent" hidden>Con esta horquilla ya puedes comparar el presupuesto que te hayan pasado y saber si está dentro de mercado. Si quieres entender de dónde sale cada cifra, lo explico todo en <a href="/blog/precio-web-negocio-pequeno">el artículo de precios</a>.</div>
+</section>
+
+<footer class="pie-h">
+  <div class="fila">
+    <a class="marca-h" href="/"><img src="/img/logo.png" alt="" width="120" height="120"><span>Mejora tu web</span></a>
+    <nav aria-label="Legal">
+      <a href="/blog">Blog</a>
+      <a href="/sobre-mi">Sobre mí</a>
+      <a href="/contacto">Contacto</a>
+      <a href="/aviso-legal">Aviso legal</a>
+      <a href="/politica-de-privacidad">Privacidad</a>
+      <a href="/politica-de-cookies">Cookies</a>
+      <a class="ig" href="https://instagram.com/mejoratuweb_" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+    </nav>
+  </div>
+  <div class="nota">
+    <p>Los importes son horquillas orientativas de mercado para negocios peque&ntilde;os en Espa&ntilde;a e incluyen dise&ntilde;o, desarrollo y puesta en marcha. No incluyen IVA. Un presupuesto real necesita hablar cinco minutos de tu negocio.</p>
+    <p>&copy; 2026 [TU NOMBRE] &middot; Herramientas y gu&iacute;as sobre visibilidad web</p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var f = document.getElementById('calc');
+  var linesEl = document.getElementById('lines');
+  var totalEl = document.getElementById('total');
+  var upkeepEl = document.getElementById('upkeep');
+  var driverEl = document.getElementById('driver-text');
+  var refEl = document.getElementById('ref');
+
+  function eur(n){ return n.toLocaleString('es-ES'); }
+  function rng(a,b){ return eur(a) + ' – ' + eur(b) + ' €'; }
+
+  function val(name){
+    var el = f.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : null;
+  }
+  function multi(name){
+    return Array.prototype.map.call(
+      f.querySelectorAll('input[name="'+name+'"]:checked'), function(i){ return i.value; });
+  }
+
+  function compute(){
+    var needs = multi('need');
+    var lines = [];
+
+    // Base: la funcionalidad más alta marcada manda
+    var base;
+    if (needs.indexOf('tienda') > -1){
+      base = {n:'Tienda online', d:'Catálogo, carrito y pasarela de pago', a:2000, b:4000};
+    } else if (needs.indexOf('reservas') > -1){
+      base = {n:'Web con reservas online', d:'Sistema de citas conectado a tu calendario', a:1500, b:2500};
+    } else if (needs.indexOf('catalogo') > -1 || needs.indexOf('leads') > -1){
+      base = {n:'Web de presentación', d:'Tus servicios, tu carta y formulario de contacto', a:800, b:1500};
+    } else {
+      base = {n:'Página única', d:'Una sola página con lo esencial de tu negocio', a:400, b:800};
+    }
+    lines.push(base);
+
+    // Secciones
+    var pages = val('pages');
+    if (pages === '10') lines.push({n:'Secciones adicionales', d:'Entre 6 y 10 páginas', a:300, b:600});
+    else if (pages === 'mas') lines.push({n:'Secciones adicionales', d:'Más de 10 páginas', a:600, b:1200});
+
+    // Contenido
+    var content = val('content');
+    if (content === 'algo') lines.push({n:'Textos y fotos', d:'Completar y ordenar lo que ya tienes', a:150, b:300});
+    else if (content === 'nada') lines.push({n:'Textos y fotos', d:'Redacción desde cero y sesión de fotos', a:300, b:600});
+
+    // Panel de edición
+    if (val('cms') === 'si') lines.push({n:'Panel de edición', d:'Para que la actualices tú sin depender de nadie', a:200, b:400});
+
+    // Migración
+    var cur = val('current');
+    if (cur === 'vieja' || cur === 'rehacer')
+      lines.push({n:'Migración', d:'Traspasar contenidos y mantener tu posición en Google', a:150, b:350});
+
+    var sum = lines.reduce(function(acc,l){ return {a:acc.a+l.a, b:acc.b+l.b}; }, {a:0,b:0});
+
+    // Urgencia
+    var urgent = val('when') === 'urgente';
+    if (urgent){
+      var ua = Math.round(sum.a*0.15/10)*10, ub = Math.round(sum.b*0.15/10)*10;
+      lines.push({n:'Recargo por urgencia', d:'Reordenar la agenda para entregarlo antes', a:ua, b:ub});
+      sum = {a:sum.a+ua, b:sum.b+ub};
+    }
+
+    // Mantenimiento
+    var up = needs.indexOf('tienda') > -1 ? [50,90]
+           : needs.indexOf('reservas') > -1 ? [40,80]
+           : [30,60];
+
+    render(lines, sum, up);
+    explain(content, needs, pages, urgent);
+    refEl.textContent = 'REF ' + refCode(needs, pages, content);
+  }
+
+  function refCode(needs, pages, content){
+    var s = (val('sector')||'x').slice(0,3).toUpperCase();
+    return s + '-' + needs.length + pages.toString().slice(0,2).toUpperCase() + '-' + content.slice(0,2).toUpperCase();
+  }
+
+  function render(lines, sum, up){
+    linesEl.innerHTML = '';
+    lines.forEach(function(l){
+      var row = document.createElement('div');
+      row.className = 'line';
+      var name = document.createElement('div');
+      name.className = 'line-name';
+      name.innerHTML = '<strong></strong><small></small>';
+      name.querySelector('strong').textContent = l.n;
+      name.querySelector('small').textContent = l.d;
+      var amt = document.createElement('div');
+      amt.className = 'line-amt';
+      amt.textContent = rng(l.a, l.b);
+      row.appendChild(name); row.appendChild(amt);
+      linesEl.appendChild(row);
+    });
+    totalEl.textContent = rng(sum.a, sum.b);
+    upkeepEl.textContent = eur(up[0]) + ' – ' + eur(up[1]) + ' € al mes';
+  }
+
+  function explain(content, needs, pages, urgent){
+    var msgs = [];
+    if (content === 'nada'){
+      msgs.push('No tener textos ni fotos es lo que más encarece una web, y casi nadie lo sabe antes de pedir presupuesto. Redactar los contenidos y hacer fotos decentes de tu negocio es trabajo aparte del desarrollo: suele suponer entre un 20 % y un 30 % del total.');
+    } else if (content === 'algo'){
+      msgs.push('Tienes parte del contenido, lo que ahorra bastante. Reunir las fotos y los textos que ya tengas antes de pedir presupuesto es la forma más rápida de bajar el precio sin recortar nada de la web.');
+    } else {
+      msgs.push('Tener los textos y las fotos listos es lo que más abarata una web. Con el contenido preparado, el presupuesto se va casi entero a diseño y desarrollo.');
+    }
+    if (needs.indexOf('tienda') > -1){
+      msgs.push('Vender online multiplica el trabajo: catálogo, stock, pagos, envíos y avisos legales. Si aún no vendes por internet, empezar por una web de presentación y añadir la tienda después suele salir más a cuenta.');
+    } else if (needs.indexOf('reservas') > -1){
+      msgs.push('Las reservas online son la parte que más se amortiza en hostelería y clínicas: quitan llamadas, reducen los plantones y funcionan de madrugada, cuando la gente reserva de verdad.');
+    }
+    if (pages === 'mas'){
+      msgs.push('Más de diez secciones deja de ser una web de presentación. Merece la pena revisar si de verdad hacen falta todas o si algunas se pueden agrupar.');
+    }
+    if (urgent){
+      msgs.push('La urgencia se paga porque obliga a mover otros trabajos de sitio, no porque se trabaje más rápido. Si puedes esperar unas semanas, ese recargo desaparece.');
+    }
+    driverEl.textContent = msgs.join(' ');
+  }
+
+  f.addEventListener('change', compute);
+
+  document.getElementById('ask').addEventListener('click', function(){
+    var s = document.getElementById('sent');
+    s.hidden = false;
+    s.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  document.getElementById('print').addEventListener('click', function(){ window.print(); });
+
+  compute();
+})();
+</script>
+
+<script src="/ambiente.js" defer></script>
+</body>
+</html>

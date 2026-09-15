@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contacto · Mejora tu web</title>
+<meta name="description" content="Cuéntame qué negocio tienes y qué necesitas. Respondo en menos de 24 horas, sin compromiso.">
+<link rel="canonical" href="https://mejoratuweb.world/contacto">
+
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="/estilo.css">
+
+<style>
+.form{display:flex;flex-direction:column;gap:18px;margin-bottom:28px;}
+.campo{display:flex;flex-direction:column;gap:6px;}
+.campo label{font-weight:700;font-size:15px;}
+.campo .ayuda{font-size:13.5px;color:var(--ink-soft);margin:-2px 0 2px;}
+.campo input,
+.campo textarea,
+.campo select{
+  font:inherit;font-size:16px;color:var(--ink);
+  background:var(--card);border:1px solid var(--line-strong);
+  border-radius:8px;padding:12px 14px;width:100%;
+}
+.campo textarea{min-height:130px;resize:vertical;}
+.campo input:focus,.campo textarea:focus,.campo select:focus{
+  outline:2px solid var(--green);outline-offset:1px;border-color:var(--green);
+}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--ink-soft);}
+.consent input{width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:var(--green);}
+.oculto{position:absolute;left:-9999px;}
+.vias{display:grid;gap:2px;margin-bottom:8px;}
+.via{
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+.via:last-child{border-bottom:0;}
+.via b{display:block;font-size:16px;}
+.via span{font-size:14.5px;color:var(--ink-soft);}
+.via a{font-family:var(--mono);font-size:14.5px;font-weight:500;align-self:center;}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Mejora tu web",
+  "description": "Herramientas gratuitas y contenidos sobre visibilidad web para negocios pequeños.",
+  "url": "https://mejoratuweb.world/",
+  "areaServed": { "@type": "Place", "name": "[TU ZONA]" },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "[TU LOCALIDAD]",
+    "postalCode": "[CP]",
+    "addressCountry": "ES"
+  },
+  "founder": { "@type": "Person", "name": "[TU NOMBRE]" },
+  "sameAs": ["https://instagram.com/mejoratuweb_"],
+  "email": "[EMAIL]"
+}
+</script>
+</head>
+<body>
+<div class="barra">
+<nav class="nav">
+  <a class="marca" href="/"><img src="/img/logo.png" alt="" width="120" height="120">Mejora tu web</a>
+  <ul>
+    <li><a href="/presupuesto">Presupuesto</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><a href="/sobre-mi">Sobre mí</a></li>
+    <li><a href="/contacto" aria-current="page">Contacto</a></li>
+  </ul>
+</nav>
+</div>
+
+<div class="wrap">
+
+<header style="padding-block:48px 8px;">
+  <p class="eyebrow">Hablemos</p>
+  <h1>Escríbeme</h1>
+  <p class="lede">Si te ha salido algo raro en el auditor, si tienes una duda sobre tu web o si crees que me he equivocado en algo de lo que escribo, cuéntamelo. Respondo en menos de 24 horas.</p>
+</header>
+
+<!--
+  El formulario funciona tal cual en Netlify gracias a data-netlify="true":
+  los mensajes te llegan al panel y por correo, sin programar nada.
+  En otro hosting, cambia el action por el de tu servicio de formularios.
+-->
+<form class="form" name="contacto" method="POST" data-netlify="true" netlify-honeypot="empresa-web" action="/gracias">
+
+  <!-- Trampa para robots de spam: una persona nunca ve este campo. -->
+  <p class="oculto" aria-hidden="true">
+    <label>No rellenes esto: <input name="empresa-web" tabindex="-1" autocomplete="off"></label>
+  </p>
+
+  <div class="campo">
+    <label for="nombre">Tu nombre</label>
+    <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+  </div>
+
+  <div class="campo">
+    <label for="email">Correo electrónico</label>
+    <input type="email" id="email" name="email" autocomplete="email" required>
+  </div>
+
+  <div class="campo">
+    <label for="telefono">Teléfono <span style="font-weight:400;color:var(--ink-soft)">(opcional)</span></label>
+    <p class="ayuda">Solo si prefieres que te llame.</p>
+    <input type="tel" id="telefono" name="telefono" autocomplete="tel">
+  </div>
+
+  <div class="campo">
+    <label for="mensaje">Tu mensaje</label>
+    <p class="ayuda">Con dos líneas me vale.</p>
+    <textarea id="mensaje" name="mensaje" required></textarea>
+  </div>
+
+  <label class="consent">
+    <input type="checkbox" id="rgpd" name="rgpd" required>
+    <span>He leído y acepto la <a href="/politica-de-privacidad">política de privacidad</a>. Usaré tus datos únicamente para responderte y no se los cedo a nadie.</span>
+  </label>
+
+  <div>
+    <button class="btn" type="submit">Enviar mensaje</button>
+  </div>
+</form>
+
+<h2>O escríbeme por aquí</h2>
+
+<div class="vias">
+  <div class="via">
+    <div><b>Correo</b><span>Si prefieres escribir con calma</span></div>
+    <a href="mailto:[EMAIL]">[EMAIL]</a>
+  </div>
+  <div class="via">
+    <div><b>Instagram</b><span>Lo más rápido. Ahí voy enseñando lo que hago y contesto a diario</span></div>
+    <a href="https://instagram.com/mejoratuweb_" target="_blank" rel="noopener">@mejoratuweb_</a>
+  </div>
+</div>
+
+<div class="rv cta">
+  <h2>¿Prefieres mirar tú primero?</h2>
+  <p>Pasa tu web por el auditor y mira qué le falta, o saca una horquilla de precio con la calculadora. Las dos son gratis y no piden datos.</p>
+  <div class="btns">
+    <a class="btn" href="/">Analizar mi web</a>
+    <a class="btn-ghost" href="/presupuesto">Calcular precio</a>
+  </div>
+</div>
+
+<footer class="pie">
+
+  <div class="pie-grid">
+
+    <div class="pie-marca">
+      <div class="pie-lockup"><img src="/img/logo.png" alt="" width="120" height="120"><span>Mejora tu web</span></div>
+      <p class="pie-blurb">Herramientas gratis y guías para entender por qué tu negocio no aparece en internet.</p>
+      <ul class="contacto-lista">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><a href="mailto:[EMAIL]">[EMAIL]</a></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><a href="https://instagram.com/mejoratuweb_" target="_blank" rel="noopener">@mejoratuweb_</a></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg><span>[TU ZONA]</span></li>
+      </ul>
+    </div>
+
+    <nav class="pie-col" aria-label="Herramientas">
+      <h3>Herramientas</h3>
+      <ul>
+        <li><a href="/">Analizar mi web</a></li>
+        <li><a href="/presupuesto">Calcular presupuesto</a></li>
+      </ul>
+    </nav>
+
+    <nav class="pie-col" aria-label="Contenido">
+      <h3>Contenido</h3>
+      <ul>
+        <li><a href="/blog">Todos los artículos</a></li>
+        <li><a href="/blog/precio-web-negocio-pequeno">Precios 2026</a></li>
+        <li><a href="/blog/ficha-google-business">Ficha de Google</a></li>
+        <li><a href="/blog/velocidad-web">Velocidad de carga</a></li>
+      </ul>
+    </nav>
+
+    <nav class="pie-col" aria-label="Información">
+      <h3>Información</h3>
+      <ul>
+        <li><a href="/sobre-mi">Sobre mí</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <div class="pie-boletin">
+      <h3>Al día</h3>
+      <p>Un correo al mes con lo que de verdad mueve la aguja en una web pequeña. Sin spam.</p>
+      <form class="suscribe" name="boletin" method="POST" data-netlify="true" action="/gracias">
+        <input type="hidden" name="form-name" value="boletin">
+        <label class="sr-only" for="nl-email">Tu correo electrónico</label>
+        <input id="nl-email" type="email" name="email" placeholder="tu@correo.com"
+               autocomplete="email" required>
+        <button type="submit" aria-label="Suscribirme"><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+      </form>
+    </div>
+
+  </div>
+
+  <div class="pie-bajo">
+    <div class="pie-social">
+      <a href="https://instagram.com/mejoratuweb_" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+    </div>
+    <nav class="pie-legal" aria-label="Legal">
+      <a href="/aviso-legal">Aviso legal</a>
+      <a href="/politica-de-privacidad">Privacidad</a>
+      <a href="/politica-de-cookies">Cookies</a>
+      <span>&copy; 2026 [TU NOMBRE]</span>
+    </nav>
+  </div>
+
+</footer>
+
+</div>
+<script src="/ambiente.js" defer></script>
+</body>
+</html>
