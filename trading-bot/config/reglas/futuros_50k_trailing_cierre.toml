@@ -1,0 +1,38 @@
+# PLANTILLA estilo firma de futuros (Nasdaq/S&P). Los números son ILUSTRATIVOS:
+# copia los de tu firma (cambian a menudo) antes de sacar conclusiones.
+nombre = "Futuros 50K · drawdown trailing al cierre (plantilla)"
+aviso = "Reglas ilustrativas. Verifica las reglas vigentes de tu firma."
+
+[[fase]]
+nombre = "Evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000
+drawdown_maximo = 2000
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0            # el suelo deja de subir al llegar al capital inicial
+perdida_diaria_max = 1000
+accion_perdida_diaria = "suspende_dia"
+consistencia_max_dia = 0.5      # ningún día puede aportar más del 50% del beneficio
+dias_minimos = 2
+max_contratos = 5               # en NQ; en MNQ suele ser 10x
+
+[fondeada]
+nombre = "Cuenta fondeada"
+capital_inicial = 50000
+objetivo_beneficio = 1000       # beneficio necesario para pedir el primer retiro
+drawdown_maximo = 2000
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0
+perdida_diaria_max = 1000
+accion_perdida_diaria = "suspende_dia"
+dias_ganadores_minimos = 5
+ganancia_minima_dia = 150
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 50           # USD
+cobro_evaluacion = "mensual"    # mensual: se paga cada mes hasta aprobar
+coste_activacion = 0
+reparto = 0.9                   # 90% para ti
+retiro_maximo = 2000
+colchon_retiro = 0

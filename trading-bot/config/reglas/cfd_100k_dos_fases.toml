@@ -1,0 +1,40 @@
+# PLANTILLA estilo firma CFD/forex de dos fases (US100/NAS100). Drawdown estático y
+# pérdida diaria que ELIMINA la cuenta. Ilustrativa: verifica las reglas vigentes.
+# Nota: el backtest usa especificaciones de futuros; para CFD ajusta tamaño y costes.
+nombre = "CFD 100K · dos fases, drawdown estático (plantilla)"
+aviso = "Reglas ilustrativas. Verifica las reglas vigentes de tu firma."
+
+[[fase]]
+nombre = "Fase 1"
+capital_inicial = 100000
+objetivo_beneficio = 10000
+drawdown_maximo = 10000
+tipo_drawdown = "estatico"
+perdida_diaria_max = 5000
+accion_perdida_diaria = "elimina"
+dias_minimos = 4
+
+[[fase]]
+nombre = "Fase 2"
+capital_inicial = 100000
+objetivo_beneficio = 5000
+drawdown_maximo = 10000
+tipo_drawdown = "estatico"
+perdida_diaria_max = 5000
+accion_perdida_diaria = "elimina"
+dias_minimos = 4
+
+[fondeada]
+nombre = "Cuenta fondeada"
+capital_inicial = 100000
+objetivo_beneficio = 2000
+drawdown_maximo = 10000
+tipo_drawdown = "estatico"
+perdida_diaria_max = 5000
+accion_perdida_diaria = "elimina"
+dias_minimos = 10
+
+[economia]
+coste_evaluacion = 540
+cobro_evaluacion = "unico"
+reparto = 0.8

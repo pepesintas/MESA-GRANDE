@@ -1,0 +1,14 @@
+# Datos de mercado (pesan mucho y suelen tener licencia): nunca al repo
+data/*
+!data/.gitkeep
+resultados/*
+!resultados/.gitkeep
+
+# Secretos
+.env
+
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/

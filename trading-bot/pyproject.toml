@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cajanegra"
+version = "0.1.0"
+description = "Laboratorio y bot de day trading orientado a cuentas de fondeo"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+]
+
+[project.optional-dependencies]
+parquet = ["pyarrow>=14"]
+databento = ["databento>=0.40"]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["cajanegra*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

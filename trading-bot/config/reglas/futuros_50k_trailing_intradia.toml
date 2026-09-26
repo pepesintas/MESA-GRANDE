@@ -1,0 +1,35 @@
+# PLANTILLA estilo firma de futuros con drawdown trailing INTRADÍA (el más exigente:
+# el suelo sube con el beneficio flotante máximo, aunque luego no lo cierres).
+nombre = "Futuros 50K · drawdown trailing intradía (plantilla)"
+aviso = "Reglas ilustrativas. Verifica las reglas vigentes de tu firma."
+
+[[fase]]
+nombre = "Evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000
+drawdown_maximo = 2500
+tipo_drawdown = "trailing_intradia"
+bloqueo_drawdown = 100
+dias_minimos = 1
+max_contratos = 10
+
+[fondeada]
+nombre = "Cuenta fondeada"
+capital_inicial = 50000
+objetivo_beneficio = 2600
+drawdown_maximo = 2500
+tipo_drawdown = "trailing_intradia"
+bloqueo_drawdown = 100
+dias_minimos = 8
+dias_ganadores_minimos = 5
+ganancia_minima_dia = 50
+consistencia_max_dia = 0.3
+max_contratos = 10
+
+[economia]
+coste_evaluacion = 40
+cobro_evaluacion = "mensual"
+coste_activacion = 85
+reparto = 0.9
+retiro_maximo = 2000
+colchon_retiro = 100
