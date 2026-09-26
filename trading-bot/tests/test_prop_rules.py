@@ -96,3 +96,22 @@ def test_economics():
     assert eco.evaluation_cost(22) == 100
     assert eco.payout(1100) == pytest.approx(900)
     assert eco.payout(5000) == pytest.approx(1800)
+
+
+def test_withdrawable_fraction_cap_and_minimum():
+    eco = Economics(retiro_fraccion=0.5, retiro_maximo=3000, retiro_minimo=500, reparto=0.9)
+    assert eco.withdrawable(800) == 0.0          # 400 < mínimo
+    assert eco.withdrawable(1200) == pytest.approx(600)
+    assert eco.withdrawable(10_000) == pytest.approx(3000)
+    assert eco.payout(1200) == pytest.approx(540)
+
+
+def test_payout_cycles_reset_counters():
+    rules = AccountRules(objetivo_beneficio=0.01, objetivo_ciclo=0.01, dias_ganadores_minimos=2, ganancia_minima_dia=150)
+    acc = PropAccount(rules)
+    day(acc, 200)
+    assert day(acc, 200) == "aprobada"
+    acc.withdraw(200)
+    assert acc.status == "activa" and acc.profit == pytest.approx(200)
+    assert day(acc, 200) == "activa"   # el ciclo nuevo vuelve a pedir 2 días ganadores
+    assert day(acc, 160) == "aprobada"

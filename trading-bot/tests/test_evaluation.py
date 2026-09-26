@@ -26,13 +26,32 @@ FIRM = FirmConfig(
 )
 
 
-def test_path_pass_and_payout():
+def test_path_pass_and_first_payout():
     rows = [(500, 0, 500, 0, 1)] * 10
-    res = simulate_path(lambda t: rows[t] if t < len(rows) else None, FIRM)
-    assert res["resultado"] == "retiro cobrado"
+    res = simulate_path(lambda t: rows[t] if t < len(rows) else None, FIRM, max_payouts=1)
+    assert res["resultado"] == "cobró y sigue activa"
     assert res["sesiones_evaluacion"] == 2
     assert res["retiro"] == pytest.approx(450)
     assert res["neto"] == pytest.approx(450 - 150)
+
+
+def test_funded_phase_collects_every_payout_until_horizon():
+    rows = [(500, 0, 500, 0, 1)] * 20
+    res = simulate_path(lambda t: rows[t] if t < len(rows) else None, FIRM, horizon=6)
+    assert res["n_retiros"] == 6 and res["retiro"] == pytest.approx(6 * 450)
+
+
+def test_payout_leaves_account_closer_to_floor():
+    # gana 1500 en fondeada, retira todo; el suelo (trailing al cierre) no baja -> una pérdida pequeña suspende
+    firm = FirmConfig(
+        nombre="t",
+        fases=[AccountRules(objetivo_beneficio=100, drawdown_maximo=1000)],
+        fondeada=AccountRules(objetivo_beneficio=1500, drawdown_maximo=1000, tipo_drawdown="trailing_cierre"),
+        economia=Economics(reparto=1.0),
+    )
+    rows = [(100, 0, 100, 0, 1), (1500, 0, 1500, 0, 1), (-600, -600, 0, 600, 1)] + [(0, 0, 0, 0, 0)] * 5
+    res = simulate_path(lambda t: rows[t] if t < len(rows) else None, firm, horizon=5)
+    assert res["n_retiros"] == 1 and res["resultado"] == "cobró y perdió la cuenta"
 
 
 def test_all_losing_days_never_pass():

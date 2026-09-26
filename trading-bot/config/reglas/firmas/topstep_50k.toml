@@ -1,0 +1,36 @@
+# Topstep · Trading Combine 50K → Express Funded Account (XFA). Revisado: 26-sep-2026.
+# (oficial) = help.topstep.com · (terceros) = comparadores · (supuesto) = dato no encontrado
+# Bots: permitidos vía API TopstepX (29 $/mes, 14,50 $ con código), SOLO desde tu PC (VPS prohibido).
+nombre = "Topstep 50K (XFA estándar)"
+aviso = "Reglas recopiladas el 26-sep-2026. Verifica en help.topstep.com antes de comprar."
+
+[[fase]]
+nombre = "Trading Combine"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (oficial)
+drawdown_maximo = 2000             # (oficial) Maximum Loss Limit, se actualiza al cierre
+tipo_drawdown = "trailing_cierre"  # (oficial) vigilado en tiempo real incluyendo flotante
+bloqueo_drawdown = 0               # (supuesto) deja de subir en el saldo inicial
+consistencia_max_dia = 0.5         # (oficial, verificar %: 50–55 %) si se supera, sube el objetivo
+dias_minimos = 2                   # (supuesto)
+max_contratos = 5                  # (supuesto) 5 minis / 50 micros
+
+[fondeada]
+nombre = "Express Funded Account"
+capital_inicial = 50000
+objetivo_beneficio = 0.01          # retiro: cualquier beneficio +
+objetivo_ciclo = 0.01              #   5 días ganadores de ≥ 150 $ por ciclo (oficial)
+dias_ganadores_minimos = 5
+ganancia_minima_dia = 150
+drawdown_maximo = 2000             # (oficial)
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0               # (supuesto)
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 49              # (oficial, precio de entrada actual) por mes hasta aprobar
+cobro_evaluacion = "mensual"
+coste_activacion = 149             # (oficial) plan estándar; existe plan sin activación con cuota mayor
+reparto = 0.9                      # (terceros) 90/10 en cuentas desde 12-ene-2026
+retiro_fraccion = 0.5              # (oficial) hasta el 50 % del saldo por retiro
+retiro_maximo = 5000               # (oficial) tope estándar por retiro

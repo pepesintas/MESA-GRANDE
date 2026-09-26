@@ -1,0 +1,34 @@
+# Tradeify · Select 50K → Select Flex fondeada. Revisado: 26-sep-2026.
+# Bots: permitidos si demuestras que son tuyos y NO los usas en otras firmas. (oficial)
+nombre = "Tradeify Select Flex 50K"
+aviso = "Reglas recopiladas el 26-sep-2026. Verifica en help.tradeify.co antes de comprar."
+
+[[fase]]
+nombre = "Select evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (oficial)
+drawdown_maximo = 2000             # (oficial) al cierre, vigilado en tiempo real
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100             # (oficial) se bloquea en 50.100 $
+consistencia_max_dia = 0.4         # (oficial)
+max_contratos = 5                  # (supuesto)
+
+[fondeada]
+nombre = "Select Flex"
+capital_inicial = 50000
+objetivo_beneficio = 0.01          # (oficial) sin colchón: basta estar en beneficio +
+objetivo_ciclo = 0.01              #   5 días ganadores de ≥ 150 $ por ciclo
+dias_ganadores_minimos = 5
+ganancia_minima_dia = 150
+drawdown_maximo = 2000
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 165             # (terceros) pago único, sin activación
+cobro_evaluacion = "unico"
+coste_activacion = 0
+reparto = 0.9                      # (terceros)
+retiro_fraccion = 0.5              # (oficial) hasta el 50 % del beneficio
+retiro_maximo = 3000               # (oficial) por retiro

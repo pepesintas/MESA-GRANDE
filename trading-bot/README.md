@@ -43,7 +43,7 @@ de cobrar, y cuánto gano o pierdo de media por cada cuenta que compro?»**
 ```bash
 cd trading-bot
 pip install -e ".[dev,parquet]"
-python -m pytest            # 45 tests, incluido un detector de "mirar al futuro"
+python -m pytest            # incluye un detector de "mirar al futuro"
 python -m cajanegra demo    # recorrido completo con datos sintéticos
 python -m cajanegra estrategias   # parámetros disponibles
 ```
@@ -66,6 +66,13 @@ python -m cajanegra walkforward --datos data/nq_1m.parquet --estrategia fvg \
     --grid objetivo_r=1.5,2,3 --grid entrada=borde,medio --grid timeframe_min=1,5 \
     --reglas config/reglas/futuros_50k_trailing_cierre.toml
 ```
+
+```bash
+# 4) ¿Qué firma conviene más para una misma estrategia? (reglas reales en config/reglas/firmas)
+python -m cajanegra comparar-firmas --esperanza 0,0.1,0.2 --riesgo 150,200,250,350
+```
+
+Investigación de firmas (política de bots, reglas, costes, comparativa): [`docs/fondeo.md`](docs/fondeo.md).
 
 Cualquier CSV sirve si tiene fecha/hora y `open, high, low, close[, volume]`. Opciones:
 `--tz-datos America/New_York` si las horas vienen sin zona, `--etiqueta end` si el

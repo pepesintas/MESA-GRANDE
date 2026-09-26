@@ -61,7 +61,7 @@ def backtest_report(res: BacktestResult) -> str:
     return "\n".join(out)
 
 
-def evaluation_report(firm: FirmConfig, roll: dict, boot: dict) -> str:
+def evaluation_report(firm: FirmConfig, roll: dict, boot: dict, horizon: int | None = None) -> str:
     out = [f"EVALUACIÓN DE FONDEO  ·  {firm.nombre}"]
     if firm.aviso:
         out.append(f"  ⚠ {firm.aviso}")
@@ -76,14 +76,16 @@ def evaluation_report(firm: FirmConfig, roll: dict, boot: dict) -> str:
             f"    probabilidad de aprobar ..... {pct(s['p_aprobar'])}"
             + ("" if math.isnan(med) else f"   (mediana {med:.0f} sesiones)"),
             f"    probabilidad de cobrar ...... {pct(s['p_retiro'])}   ({pct(s['p_retiro_si_fondeada'])} de las fondeadas)",
-            f"    retiro medio si cobras ...... {money(s['retiro_medio_si_cobra'])}",
+            f"    cobrado medio si cobras ..... {money(s['cobrado_medio_si_cobra'])}   ({s['retiros_medios_si_cobra']:.1f} retiros de media)",
             f"    coste medio por intento ..... {money(s['coste_medio'])}",
             f"    VALOR ESPERADO POR CUENTA ... {money(s['valor_esperado_por_cuenta'])}",
         ]
         out.append("    desenlaces: " + ", ".join(f"{k} {v}" for k, v in s["resultados"].items()))
         if s["motivos_suspension"]:
             out.append("    motivos de suspensión: " + ", ".join(f"{k} {v}" for k, v in s["motivos_suspension"].items()))
-    out += ["", "  (Solo se cuenta el primer retiro. Cuentas con la misma estrategia NO diversifican: fallan juntas.)"]
+    h = f"{horizon} sesiones" if horizon else "el horizonte simulado"
+    out += ["", f"  (Cuenta todos los retiros durante {h} de cuenta fondeada. Varias cuentas con la misma"
+            " estrategia NO diversifican: fallan juntas.)"]
     return "\n".join(out)
 
 

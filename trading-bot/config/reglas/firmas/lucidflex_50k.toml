@@ -1,0 +1,34 @@
+# Lucid Trading · LucidFlex 50K. Revisado: 26-sep-2026.
+# Bots: permitidos con aprobación previa POR ESCRITO. (oficial)
+nombre = "LucidFlex 50K"
+aviso = "Reglas recopiladas el 26-sep-2026 (varios datos supuestos). Verifica en support.lucidtrading.com."
+
+[[fase]]
+nombre = "LucidFlex evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (supuesto)
+drawdown_maximo = 2000             # (supuesto) al cierre (tipo: oficial)
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100             # (supuesto) se bloquea al superar el saldo de bloqueo
+consistencia_max_dia = 0.5         # (oficial) sin límite diario (oficial)
+max_contratos = 5                  # (supuesto)
+
+[fondeada]
+nombre = "LucidFlex fondeada"
+capital_inicial = 50000
+objetivo_beneficio = 0.01          # (oficial) sin colchón ni consistencia; beneficio neto + del ciclo
+objetivo_ciclo = 0.01
+dias_ganadores_minimos = 5         # (oficial) 5 días con el mínimo diario
+ganancia_minima_dia = 150          # (supuesto) importe del mínimo diario
+drawdown_maximo = 2000
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 175             # (terceros) pago único
+cobro_evaluacion = "unico"
+coste_activacion = 0               # (supuesto)
+reparto = 0.9                      # (oficial)
+retiro_fraccion = 0.5              # (oficial) hasta el 50 % del saldo
+retiro_maximo = 2000               # (supuesto) existe tope, importe no encontrado

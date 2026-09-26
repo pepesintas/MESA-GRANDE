@@ -18,16 +18,17 @@ DD_TYPES = ("estatico", "trailing_cierre", "trailing_intradia")
 class AccountRules:
     nombre: str = "Evaluación"
     capital_inicial: float = 50_000.0
-    objetivo_beneficio: float | None = None   # en la fondeada: beneficio necesario para pedir retiro
+    objetivo_beneficio: float | None = None   # en la fondeada: beneficio necesario para el PRIMER retiro
+    objetivo_ciclo: float | None = None       # fondeada: beneficio desde el último retiro para pedir otro
     drawdown_maximo: float = 2_000.0
     tipo_drawdown: str = "trailing_cierre"    # estatico | trailing_cierre | trailing_intradia
     bloqueo_drawdown: float | None = None     # el suelo deja de subir en capital_inicial + este valor
     perdida_diaria_max: float | None = None
     accion_perdida_diaria: str = "suspende_dia"  # suspende_dia (la firma cierra y paras hoy) | elimina
-    dias_minimos: int = 0                     # días operados mínimos
-    dias_ganadores_minimos: int = 0
+    dias_minimos: int = 0                     # días operados mínimos (por fase o por ciclo de retiro)
+    dias_ganadores_minimos: int = 0           # por fase o por ciclo de retiro
     ganancia_minima_dia: float = 0.0          # para que un día cuente como "ganador"
-    consistencia_max_dia: float | None = None  # el mejor día no puede superar esta fracción del beneficio
+    consistencia_max_dia: float | None = None  # el mejor día no puede superar esta fracción del beneficio del ciclo
     dias_maximos: int | None = None           # sesiones máximas desde el inicio (None = sin límite)
     max_contratos: int | None = None          # se aplica en el backtest vía guardián
 
@@ -52,8 +53,10 @@ class Economics:
     cobro_evaluacion: str = "unico"  # unico | mensual
     coste_activacion: float = 0.0    # al pasar a fondeada
     reparto: float = 0.9             # parte del beneficio que cobras
-    retiro_maximo: float | None = None
-    colchon_retiro: float = 0.0      # beneficio que debe quedar en la cuenta tras el retiro
+    retiro_maximo: float | None = None   # tope por retiro (importe bruto)
+    retiro_fraccion: float = 1.0     # fracción del beneficio retirable por petición (p. ej. 0.5)
+    retiro_minimo: float = 0.0       # importe bruto mínimo de un retiro
+    colchon_retiro: float = 0.0      # beneficio que debe quedar siempre en la cuenta
     sesiones_por_mes: int = 21
 
     def evaluation_cost(self, sessions: int) -> float:
@@ -61,11 +64,16 @@ class Economics:
             return self.coste_evaluacion * max(1, math.ceil(sessions / self.sesiones_por_mes))
         return self.coste_evaluacion
 
-    def payout(self, profit: float) -> float:
-        amount = max(0.0, profit - self.colchon_retiro)
+    def withdrawable(self, profit: float) -> float:
+        """Importe bruto que se puede retirar ahora con ese beneficio acumulado (0 si no llega al mínimo)."""
+        amount = max(0.0, profit - self.colchon_retiro) * self.retiro_fraccion
         if self.retiro_maximo is not None:
             amount = min(amount, self.retiro_maximo)
-        return amount * self.reparto
+        return amount if amount > 0 and amount >= self.retiro_minimo else 0.0
+
+    def payout(self, profit: float) -> float:
+        """Lo que cobras (tras el reparto) al retirar con ese beneficio."""
+        return self.withdrawable(profit) * self.reparto
 
 
 @dataclass
@@ -109,8 +117,16 @@ class PropAccount:
         self.days_traded = 0
         self.winning_days = 0
         self.best_day = 0.0
-        self.status = "activa"   # activa | aprobada | suspendida | caducada
+        self.status = "activa"   # activa | aprobada (o retiro disponible) | suspendida | caducada
         self.reason = ""
+        self.payouts = 0
+        self._new_cycle()
+
+    def _new_cycle(self) -> None:
+        self.cycle_start = self.balance
+        self.cycle_days = 0
+        self.cycle_winning = 0
+        self.cycle_best = 0.0
 
     @property
     def profit(self) -> float:
@@ -156,9 +172,12 @@ class PropAccount:
                 self.floor = max(self.floor, self._floor_from(self.hwm))
             self.balance = start + day_pnl
             self.days_traded += 1
+            self.cycle_days += 1
             self.best_day = max(self.best_day, day_pnl)
+            self.cycle_best = max(self.cycle_best, day_pnl)
             if day_pnl > 0 and day_pnl >= r.ganancia_minima_dia:
                 self.winning_days += 1
+                self.cycle_winning += 1
             if r.tipo_drawdown != "estatico" and self.balance > self.hwm:
                 self.hwm = self.balance
                 self.floor = max(self.floor, self._floor_from(self.hwm))
@@ -169,12 +188,25 @@ class PropAccount:
             self.status, self.reason = "caducada", "límite de días"
         return self.status
 
+    def withdraw(self, amount: float) -> None:
+        """Retira `amount` (bruto). El suelo de drawdown NO baja: quedas más cerca de él."""
+        self.balance -= amount
+        self.payouts += 1
+        self.status, self.reason = "activa", ""
+        self._new_cycle()
+
     def _target_reached(self) -> bool:
         r = self.r
-        if r.objetivo_beneficio is None or self.profit < r.objetivo_beneficio:
+        if self.payouts == 0:
+            if r.objetivo_beneficio is None or self.profit < r.objetivo_beneficio:
+                return False
+        else:
+            goal = r.objetivo_ciclo if r.objetivo_ciclo is not None else r.objetivo_beneficio
+            if goal is None or self.balance - self.cycle_start < goal:
+                return False
+        if self.cycle_days < r.dias_minimos or self.cycle_winning < r.dias_ganadores_minimos:
             return False
-        if self.days_traded < r.dias_minimos or self.winning_days < r.dias_ganadores_minimos:
-            return False
-        if r.consistencia_max_dia is not None and self.best_day > r.consistencia_max_dia * self.profit:
+        cycle_profit = self.balance - self.cycle_start
+        if r.consistencia_max_dia is not None and self.cycle_best > r.consistencia_max_dia * cycle_profit:
             return False
         return True

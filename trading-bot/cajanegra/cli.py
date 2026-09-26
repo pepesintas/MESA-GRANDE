@@ -122,7 +122,7 @@ def cmd_backtest(args):
     extra = None
     if firm is not None:
         roll, boot = _evaluate(res.days, firm, args)
-        report += "\n\n" + evaluation_report(firm, roll, boot)
+        report += "\n\n" + evaluation_report(firm, roll, boot, args.horizonte)
         extra = {"arranques_historicos": roll, "bootstrap": boot}
     print(report)
     _save(args.salida, res, report, extra)
@@ -145,7 +145,7 @@ def cmd_walkforward(args):
     report = "\n" + walkforward_report(wf.windows)
     if firm is not None:
         roll, boot = _evaluate(wf.days, firm, args)
-        report += "\n\nSolo con los tramos fuera de muestra:\n" + evaluation_report(firm, roll, boot)
+        report += "\n\nSolo con los tramos fuera de muestra:\n" + evaluation_report(firm, roll, boot, args.horizonte)
     print(report)
     if args.salida:
         out = Path(args.salida)
@@ -169,7 +169,7 @@ def cmd_demo(args):
     print()
     roll = summarize(rolling_starts(res.days, firm, horizon=args.horizonte))
     boot = summarize(block_bootstrap(res.days, firm, n_sims=500, horizon=args.horizonte, seed=args.semilla))
-    print(evaluation_report(firm, roll, boot))
+    print(evaluation_report(firm, roll, boot, args.horizonte))
 
 
 def cmd_sintetico(args):
@@ -184,6 +184,39 @@ def cmd_descargar(args):
     from .data.databento_fetch import download
 
     download(args.simbolo, args.desde, args.hasta, args.salida, only_cost=args.solo_coste)
+
+
+def cmd_comparar_firmas(args):
+    import glob
+
+    from .research.firm_compare import best_by_firm, compare_firms
+    from .report import money, pct
+
+    files = args.reglas or sorted(glob.glob(str(ROOT / "config/reglas/firmas/*.toml")))
+    firms = {}
+    for f in files:
+        c = FirmConfig.from_toml(f)
+        firms[c.nombre] = c
+    edges = [float(x) for x in args.esperanza.split(",")]
+    risks = [float(x) for x in args.riesgo.split(",")]
+    print(f"Comparando {len(firms)} firmas · ventajas {edges} R · riesgos {risks} $ · "
+          f"{args.simulaciones} trayectorias · {args.horizonte} sesiones por fase\n")
+    table = compare_firms(firms, edges, risks, n_paths=args.simulaciones, horizon=args.horizonte,
+                          payoff_r=args.payoff, prob_operar=args.prob_operar, seed=args.semilla)
+    best = best_by_firm(table)
+    for e, grp in best.groupby("esperanza_r", sort=True):
+        print(f"Ventaja {e:+.2f} R por operación (mejor riesgo para cada firma):")
+        for _, r in grp.iterrows():
+            print(f"  {r['firma']:32s} riesgo {money(r['riesgo_usd']):>7}  aprueba {pct(r['p_aprobar']):>6}  "
+                  f"cobra {pct(r['p_cobrar']):>6}  coste {money(r['coste_medio']):>6}  "
+                  f"VALOR ESPERADO {money(r['valor_esperado']):>8}")
+        print()
+    if args.salida:
+        out = Path(args.salida)
+        out.mkdir(parents=True, exist_ok=True)
+        table.to_csv(out / "comparativa_firmas.csv", index=False)
+        best.to_csv(out / "mejor_riesgo_por_firma.csv", index=False)
+        print(f"Tablas guardadas en {out}/")
 
 
 def cmd_estrategias(args):
@@ -272,6 +305,18 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--salida", default="data/nq_1m.parquet")
     sp.add_argument("--solo-coste", action="store_true", help="solo consultar lo que costaría")
     sp.set_defaults(func=cmd_descargar)
+
+    sp = sub.add_parser("comparar-firmas", help="qué firma conviene más para una misma estrategia")
+    sp.add_argument("--reglas", nargs="*", help="ficheros TOML (por defecto config/reglas/firmas/*.toml)")
+    sp.add_argument("--esperanza", default="-0.05,0,0.05,0.1,0.15,0.2,0.3", help="ventajas en R por operación")
+    sp.add_argument("--riesgo", default="100,150,200,250,350,500,750", help="riesgos por operación en USD")
+    sp.add_argument("--payoff", type=float, default=2.0, help="R que gana un acierto")
+    sp.add_argument("--prob-operar", type=float, default=0.85, help="probabilidad de operar cada día")
+    sp.add_argument("--simulaciones", type=int, default=1000)
+    sp.add_argument("--horizonte", type=int, default=120, help="sesiones máximas por fase y en la fondeada")
+    sp.add_argument("--semilla", type=int, default=0)
+    sp.add_argument("--salida")
+    sp.set_defaults(func=cmd_comparar_firmas)
 
     sp = sub.add_parser("estrategias", help="listar estrategias, parámetros e instrumentos")
     sp.set_defaults(func=cmd_estrategias)

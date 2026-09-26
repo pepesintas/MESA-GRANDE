@@ -1,0 +1,33 @@
+# TradeDay · Quick Pay EOD 50K. Revisado: 26-sep-2026.
+# Bots: propios permitidos; prohibidos los comprados a terceros o compartidos. (oficial)
+# OJO (terceros): en Quick Pay el drawdown es al cierre en la evaluación pero INTRADÍA una vez fondeada.
+nombre = "TradeDay Quick Pay 50K"
+aviso = "Reglas recopiladas el 26-sep-2026 (sobre todo de terceros). Verifica en tradeday.com."
+
+[[fase]]
+nombre = "Evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (terceros)
+drawdown_maximo = 2000             # (terceros)
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0               # (oficial) se congela en el saldo inicial
+consistencia_max_dia = 0.3         # (terceros)
+dias_minimos = 5                   # (terceros)
+max_contratos = 5                  # (terceros)
+
+[fondeada]
+nombre = "Quick Pay fondeada"
+capital_inicial = 50000
+objetivo_beneficio = 250           # (terceros) retiro mínimo 250 $, sin colchón, desde el día 1
+objetivo_ciclo = 250
+drawdown_maximo = 2000
+tipo_drawdown = "trailing_intradia"  # (terceros)
+bloqueo_drawdown = 0
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 175             # (terceros) tarifa; con promoción ~79 $
+cobro_evaluacion = "unico"
+coste_activacion = 0               # (supuesto)
+reparto = 0.8                      # (terceros) 80 % hasta 50.000 $ cobrados
+retiro_minimo = 250

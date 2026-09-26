@@ -1,0 +1,33 @@
+# My Funded Futures · Rapid EOD 50K. Revisado: 26-sep-2026.
+# Bots: permitidos (estrategias propias; prohibido HFT y explotar ejecuciones simuladas). (oficial)
+nombre = "MyFundedFutures Rapid EOD 50K"
+aviso = "Reglas recopiladas el 26-sep-2026. Verifica en help.myfundedfutures.com antes de comprar."
+
+[[fase]]
+nombre = "Evaluación"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (oficial)
+drawdown_maximo = 2000             # (oficial/terceros) al cierre
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100             # (supuesto, igual que en fondeada)
+consistencia_max_dia = 0.3         # (terceros) mejor día ≤ 30 %; verificar
+dias_minimos = 4                   # (terceros)
+max_contratos = 5                  # (supuesto)
+
+[fondeada]
+nombre = "Rapid EOD fondeada"
+capital_inicial = 50000
+objetivo_beneficio = 2600          # (oficial) colchón 2.100 $ + retiro mínimo 500 $
+objetivo_ciclo = 500               # (oficial) 500 $ de beneficio desde el último retiro
+drawdown_maximo = 2000             # (oficial) al cierre
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 100             # (oficial) se bloquea al llegar a +100 $
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 157             # (terceros) pago único, sin activación
+cobro_evaluacion = "unico"
+coste_activacion = 0
+reparto = 0.9                      # (oficial)
+colchon_retiro = 2100              # (oficial, interpretación conservadora: el colchón se queda)
+retiro_minimo = 500                # (oficial)
