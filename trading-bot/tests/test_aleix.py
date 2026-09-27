@@ -58,14 +58,22 @@ def test_sell_after_bias_zone_and_ifvg():
     assert len(res.trades) == 1
     t = res.trades.iloc[0]
     assert t.lado == "corto" and t.precio_entrada == 190.0 and et(t.hora_entrada) == "09:53"
-    # stop sobre el extremo del retroceso (193) + 2 ticks = 193,5 -> riesgo 3,5 -> objetivo 1,5R = 184,75
+    # stop por defecto = borde del IFVG (192,1) + 2 ticks = 192,6, redondeado a tick = 192,5 -> riesgo 2,5
+    # (verificado con sus propios ejemplos: el stop se ajusta al IFVG de 1 min, no al retroceso completo)
+    assert t.riesgo_usd == 2.5 * MNQ.point_value
+    assert t.motivo == "objetivo" and t.precio_salida == 186.0
+
+
+def test_stop_extremo_uses_the_full_pullback_instead_of_the_ifvg():
+    t = run(sell_day(), stop="extremo").trades.iloc[0]
+    # extremo del retroceso (193) + 2 ticks = 193,5 -> riesgo 3,5 -> objetivo 1,5R = 184,75
     assert t.riesgo_usd == 3.5 * MNQ.point_value
-    assert t.motivo == "objetivo" and t.precio_salida == 184.75
+    assert t.precio_salida == 184.75
 
 
 def test_buy_is_the_mirror_image():
     t = run(mirror(sell_day())).trades.iloc[0]
-    assert t.lado == "largo" and t.precio_entrada == 210.0 and t.precio_salida == 215.25
+    assert t.lado == "largo" and t.precio_entrada == 210.0 and t.precio_salida == 214.0
 
 
 def test_target_at_next_structural_low():
@@ -77,18 +85,32 @@ def test_needs_room_to_the_draw_on_liquidity():
     assert run(sell_day(), exigir_dol=True).trades.empty          # el siguiente mínimo (189) está a menos de 1,5R
     prev = [(182, 183, 180, 181)] * 5                              # ayer marcó 180: objetivo lejano
     res = run(sell_day(a_low=188.8), prev=prev, exigir_dol=True)
-    assert len(res.trades) == 1 and res.trades.iloc[0].precio_salida == 184.75
+    assert len(res.trades) == 1 and res.trades.iloc[0].precio_salida == 186.0
 
 
 def test_no_trade_when_bearish_fvgs_are_not_respected():
     assert run(sell_day(c4_close=199.5)).trades.empty  # el FVG bajista se invalida: dirección alcista
 
 
-def test_default_takes_profit_at_the_draw_on_liquidity_with_minimum_ratio():
+def _far_dol_day():
     prev = [(182, 183, 180, 181)] * 5
     day = sell_day(a_low=188.8)[:-4] + [(184.8, 185, 179.5, 180.2), (180.2, 180.5, 180, 180.3)]
+    return prev, day
+
+
+def test_takes_profit_at_the_draw_on_liquidity_when_within_the_cap():
+    prev, day = _far_dol_day()
     bars = make_days([prev, day])
-    res = Backtester(bars, MNQ, costs=CostModel(slippage_ticks=0)).run(AleixIFVG(htf_min=3))
+    # sin tope: objetivo = mínimo de ayer (siguiente punto estructural), ratio ≈ 2,9 ≥ 1,5
+    res = Backtester(bars, MNQ, costs=CostModel(slippage_ticks=0)).run(AleixIFVG(htf_min=3, objetivo_r_max=None))
     t = res.trades.iloc[0]
-    # objetivo = mínimo de ayer (siguiente punto estructural), ratio 10 / 3,5 ≈ 2,9 ≥ 1,5
     assert t.motivo == "objetivo" and t.precio_salida == 180.0
+
+
+def test_objetivo_r_max_caps_a_distant_dol():
+    # verificado: "si el objetivo está muy lejos, targetea directamente un 1 a 2"
+    prev, day = _far_dol_day()
+    bars = make_days([prev, day])
+    res = Backtester(bars, MNQ, costs=CostModel(slippage_ticks=0)).run(AleixIFVG(htf_min=3))  # objetivo_r_max=2.0 por defecto
+    t = res.trades.iloc[0]
+    assert t.motivo == "objetivo" and t.precio_salida == 184.75  # 2R, no los 180 de la DOL

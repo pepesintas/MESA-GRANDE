@@ -19,3 +19,4 @@ __pycache__/
 *.webm
 fotogramas*/
 material_privado/
+.DS_Store

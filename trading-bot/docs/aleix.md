@@ -118,9 +118,10 @@ reproducen su ejemplo de venta vela a vela, el espejo de compra y los casos en q
 | `htf_min` / `ltf_min` | 15 / 1 | Temporalidades de los pasos 1–2 (él usa 15 min o 1 h) y del paso 3 |
 | `respeto` | `impulso` | FVG respetado = lo mitiga y después cierra al otro lado a favor (`toque`: basta con tocarlo) |
 | `zona_minutos` | 60 | Cuánto espera la confirmación tras tocar la zona |
-| `stop` | `extremo` | **Supuesto** para su "stop debajo": más allá del extremo del retroceso (alternativa `ifvg`: más allá del IFVG) |
+| `stop` | `ifvg` | **Verificado con sus dos ejemplos:** el stop se ajusta al borde del IFVG de 1 min, no al extremo de todo el retroceso (`extremo`: opción alternativa, sigue disponible) |
 | `objetivo` | `dol` | **Take profit en el objetivo** (máximos/mínimos de la temporalidad mayor o de ayer). `r`: fijo, como en su challenge |
 | `objetivo_r` / `exigir_dol` | 1,5 / sí | Ratio mínimo hasta el objetivo para aceptar la operación (y ratio del objetivo fijo) |
+| `objetivo_r_max` | 2,0 | **Verificado:** "si el objetivo está muy lejos, targetea directamente un 1 a 2" → tope al objetivo=dol en 2R; `None` lo desactiva |
 | `hora_limite_entrada` | 11:30 | Sesión de la mañana de Nueva York (él dedica ~2 h al día) |
 | `max_operaciones` | 1 | Una por día (su challenge busca 1 TP por día por la consistencia) |
 
@@ -144,10 +145,33 @@ y con stops cortos los costes pesan (0,045–0,075 R por operación con minis, v
 También existe el filtro `flujo_fvg` en la estrategia `fvg` (solo el paso 1), útil para probar la
 dirección de Aleix con otras entradas.
 
-**Validación con sus propios ejemplos:** muestra operaciones tomadas en directo el **26 y 28 de
-agosto y el 8 de septiembre** (una venta y dos compras). Con datos reales de esos días, el primer
-test será comprobar que el bot marca la misma dirección, la misma zona y el mismo IFVG que él. Si no
-coinciden, se ajustan los parámetros antes de mirar ningún resultado.
+### Validado con sus propios ejemplos (fotogramas del vídeo, TradingView, NQ1!)
+
+Extraídos con ffmpeg del vídeo fijado (nunca subido al repo: ver `traspaso_local.md`). En los dos
+casos usó la herramienta de posición de TradingView, que muestra el precio y el R:R exactos:
+
+| Fecha (real, en el gráfico) | Lado | Entrada | Stop | Objetivo (DOL) | Distancia stop | R:R |
+|---|---|---|---|---|---|---|
+| 8-sep-2026, ~10:00 hora NY (justo en la apertura) | Venta | 29.502,75 | 29.535,25 | 29.447,75 | 32,5 pt | 1,66 |
+| 26-ago-2026, ~08:15 hora NY (**antes** de las 09:30) | Compra | 29.605,75 | 29.568,50 | 29.681,00 | 37,25 pt | 2,02 |
+
+Confirma: instrumento **NQ1!** (Nasdaq-100 continuo), temporalidad mayor **15 min**, estructura del
+mercado analizada usando también velas de horas previas (en el ejemplo del 8-sep mira desde la
+01:15, sesión de Asia/Londres, aunque la entrada dispara en NY), y el indicador de terceros
+**"LuxAlgo - Sessions"** activo en su gráfico (marca las sesiones). El stop en los dos casos es
+mucho más corto que el tamaño de la zona de 15 min: confirma `stop="ifvg"`, no el retroceso completo.
+Con datos reales de esos dos días, el primer test será comprobar que el bot marca la misma dirección,
+zona e IFVG que él; si no coinciden, se ajustan los parámetros antes de mirar ningún resultado.
+
+**Nuevo, de la última parte del vídeo:** "si el objetivo está muy lejos, targetea directamente un
+1 a 2" → implementado como `objetivo_r_max=2.0` (tope al objetivo=dol; su segundo ejemplo, R:R 2,02,
+es justo ese caso). Repitió también, calculadora en mano, la gestión de cuentas del primer audio:
+evaluación 50.000→53.000 $ con dos TP de 1.500 $ (1:1,5, arriesgando 1.000 $), y fondeada con 5 días
+de 150 $+ para poder retirar. **Un matiz a vigilar:** en su propia calculadora del club, con un
+beneficio de 1.300 $ retira los **1.300 $ enteros**, no el 50 % — puede ser porque el 50 % es un
+tope sobre el *balance* (no sobre el beneficio) y con beneficios pequeños nunca se alcanza, lo que
+sería coherente con nuestro modelo; o puede que su calculadora simplifique la regla real de la
+firma. Tratar sus cifras de retiro con margen hasta confirmarlo con la firma elegida.
 
 ## Capturas: reglas de la cuenta fondeada
 
@@ -185,15 +209,23 @@ da cuántos de los "más de 150" alumnos cobran de forma sostenida. Frente a eso
 
 ## Lo que falta por confirmar de su sistema
 
-Resuelto con la última parte del vídeo: el objetivo es la DOL (no un R fijo), la dirección se mira
-en 15 min o 1 h, y "respetar" incluye el impulso posterior. Queda:
+Resuelto con el vídeo completo (48 min revisados fotograma a fotograma) y sus dos ejemplos reales:
+el objetivo es la DOL con tope en 2R si queda muy lejos, la dirección se mira en 15 min o 1 h,
+"respetar" incluye el impulso posterior, **el stop va justo tras el borde del IFVG de 1 min** (no
+el extremo de todo el retroceso), y **no hay ningún gráfico del S&P en todo el vídeo** — sin
+evidencia de que use divergencia SMT (puede que lo mencione en otro vídeo suyo). Sesiones:
+confirmado que al menos un ejemplo entra a las 08:15 hora de Nueva York, **antes** de la apertura
+(09:30) — no opera exclusivamente en el rango 09:30–11:30 que supusimos al principio. Queda:
 
-1. **Dónde exactamente va el stop "debajo":** ¿del IFVG, del mínimo del retroceso, de la zona?
-2. **Cómo entra:** ¿a mercado al cerrar la vela que invierte, o con límite en el retesteo del IFVG?
-3. **Sesiones:** dice que sirve a cualquier hora; ¿opera Londres y Asia o solo Nueva York?
-   (con datos de 24 h se puede probar; las velas de 30 s requieren datos por segundos).
-4. **El gráfico del S&P** que menciona: ¿lo usa para confirmar (divergencia SMT)?
-5. **Qué es un "trade A+"** en la cuenta fondeada.
+1. **Cómo entra exactamente:** ¿a mercado al cerrar la vela que invierte, o con límite en el
+   retesteo del IFVG? El precio de entrada en sus dos ejemplos coincide con un nivel estructural
+   limpio, lo que sugiere posible límite; mantenemos mercado (opción conservadora) hasta confirmar.
+2. **El rango horario completo:** con un solo dato (08:15) no sabemos si opera toda la sesión de
+   Asia/Londres o solo desde poco antes de Nueva York. Con datos de 24 h se puede acotar mejor
+   viendo en qué horas aparecen sus configuraciones en más días.
+3. **Qué es exactamente un "trade A+"** en la cuenta fondeada (probablemente: un setup con los 3
+   pasos muy limpios y buen R:R, pero no lo define con esas palabras en este vídeo).
+4. **La regla de retiro exacta** de la firma que use de verdad (ver el matiz sobre el 50 % arriba).
 
 ## Reproducirlo
 

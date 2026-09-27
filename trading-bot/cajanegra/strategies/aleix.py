@@ -7,12 +7,23 @@
 3. CONFIRMACIÓN en 1 min (él a veces baja a 30 s): un IFVG. Dentro de la zona se forma un FVG en
    contra y el precio lo invierte: entrada "con el stop loss debajo y el take profit en el objetivo".
 
-Supuestos nuestros (la transcripción no los concreta; todos son parámetros):
-- Stop "debajo": más allá del extremo del retroceso desde que se tocó la zona (`stop=extremo`) o
-  más allá del IFVG (`stop=ifvg`).
-- Entrada a mercado en la apertura de la vela siguiente a la inversión.
-- Ratio mínimo de 1,5 (el de su challenge) para aceptar la operación (`exigir_dol`, `objetivo_r`).
-- Datos solo de la sesión de Nueva York (sin los FVG de Asia/Londres); sin velas de 30 s.
+Verificado con capturas reales de su vídeo (TradingView, NQ1!, herramienta de posición larga/corta):
+- Venta del 8-sep-2026 (~10:00 hora de Nueva York): entrada 29.502,75, stop 29.535,25 (32,5 puntos,
+  justo tras el borde del IFVG de 1 min, NO el extremo de todo el retroceso de 15 min), objetivo
+  29.447,75 = la DOL (R:R 1,66).
+- Compra del 26-ago-2026 (~08:15 hora de Nueva York, **antes** de la apertura de las 09:30): entrada
+  29.605,75, stop 29.568,50 (37,25 puntos), objetivo 29.681,00 = la DOL (R:R 2,02).
+- Las dos confirman: stop MUY por debajo del tamaño de la zona de 15 min (ajustado al IFVG de 1 min,
+  no al retroceso completo) → `stop="ifvg"` es el valor por defecto. Objetivo siempre en la DOL.
+- Al menos un ejemplo entra antes de las 09:30: amplío `hora_inicio` por defecto a 08:00.
+- Indicador de terceros visible en su gráfico: "LuxAlgo - Sessions" (marca las sesiones); no aparece
+  ningún gráfico del S&P en todo el vídeo (48 min revisados) — sin evidencia de divergencia SMT.
+
+Sigue sin confirmar (no aparece en este vídeo; preguntar a Aleix o buscar en otro suyo):
+- Cómo entra exactamente (a mercado al confirmarse el IFVG, o límite en el borde) — el precio de
+  entrada en sus dos ejemplos coincide con un nivel estructural limpio (el borde de la zona), lo que
+  sugiere posible entrada por límite; mantenemos mercado por ser la opción conservadora.
+- Qué es un "trade A+" en la cuenta fondeada.
 """
 
 from __future__ import annotations
@@ -36,14 +47,15 @@ class AleixIFVG(Strategy):
         "respeto": "impulso",          # impulso: lo mitiga y se aleja | toque: basta con tocarlo
         "zona_minutos": 60,            # cuánto dura una zona tras tocarla
         "direccion": "ambas",
-        "hora_inicio": "09:30",
+        "hora_inicio": "08:00",        # verificado: al menos un ejemplo entra a las 08:15 NY, antes de la apertura
         "hora_limite_entrada": "11:30",
         "hora_salida": "15:50",
-        "stop": "extremo",             # extremo | ifvg
+        "stop": "ifvg",                # verificado: el stop se ajusta al IFVG de 1 min, no al retroceso completo (extremo)
         "stop_margen_ticks": 2,
         "objetivo": "dol",             # dol: el siguiente punto estructural (su vídeo) | r: fijo en R (su challenge)
         "objetivo_r": 1.5,             # ratio del objetivo fijo, y ratio mínimo exigido hasta la DOL
         "exigir_dol": True,            # solo si el siguiente punto estructural está a ≥ objetivo_r·riesgo
+        "objetivo_r_max": 2.0,         # verificado: "si el objetivo está muy lejos, targetea 1 a 2" -> tope en objetivo=dol
         "max_operaciones": 1,
         "contratos": 1,
         "riesgo_usd": 0.0,
@@ -197,6 +209,11 @@ class AleixIFVG(Strategy):
             if target_dol is None:
                 return
             target = target_dol
+            cap_r = self.p["objetivo_r_max"]
+            if cap_r:  # verificado: si la DOL queda muy lejos, no va a por todo el recorrido
+                cap_dist = float(cap_r) * risk
+                if abs(target - entry) > cap_dist:
+                    target = entry + side * cap_dist
         else:
             target = entry + side * min_dist
         n = size_for_risk(inst, risk, self.p["contratos"], self.p["riesgo_usd"], self.p["max_contratos"])
