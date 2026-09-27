@@ -12,3 +12,10 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .venv/
+
+# Material de terceros (vídeos, fotogramas, subtítulos de cursos): nunca al repo, es público
+*.mp4
+*.mov
+*.webm
+fotogramas*/
+material_privado/

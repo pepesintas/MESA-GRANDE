@@ -10,3 +10,4 @@
 - pandas 3 usa resolución µs en fechas: convierte con `.as_unit("ns")` antes de usar `.asi8`.
 - Las reglas de firmas en `config/reglas` son plantillas ilustrativas; no afirmes que son las de una firma real.
 - Nunca subas datos de mercado (`data/`) ni `.env`.
+- Nunca subas material de terceros (vídeos, fotogramas, subtítulos de cursos): el repo es público. Ver `docs/traspaso_local.md`.
