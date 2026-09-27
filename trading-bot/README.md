@@ -90,6 +90,10 @@ después de las 11:00. Todo es parametrizable (`timeframe_min`, `entrada=medio`,
 `stop=fvg`, `filtro_tendencia=media_diaria+apertura`, ...). El filtro `flujo_fvg` implementa
 el paso 1 de su sistema (dirección según qué FVG se respetan y cuáles no). Faltan los pasos 2 y 3.
 
+**`aleix` — el sistema de 3 pasos de Aleix Andreu:** dirección por FVG respetados/no respetados
+en 15 min → zona de reacción (FVG de 15 min a favor) → confirmación con IFVG en 1 min. Stop y
+objetivo configurables (los detalles que su vídeo no concreta están marcados como supuestos).
+
 **`orb` — ruptura del rango de apertura.** Referencia pública (Zarattini & Aziz, 2023)
 para tener siempre un punto de comparación.
 

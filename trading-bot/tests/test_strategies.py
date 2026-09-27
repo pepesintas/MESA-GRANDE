@@ -86,6 +86,7 @@ def test_unknown_param_rejected():
     ("zona_ruido", {}),
     ("zona_ruido", {"stop_continuo": True}),
     ("ultima_media_hora", {}),
+    ("aleix", {"exigir_dol": False, "max_operaciones": 3, "hora_limite_entrada": "15:30"}),
 ])
 def test_no_edge_on_random_walk(name, kw):
     """Detector de lookahead: en un paseo aleatorio el resultado bruto medio debe ser ~0.

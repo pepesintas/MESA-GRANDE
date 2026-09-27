@@ -1,8 +1,8 @@
 # El plan de Aleix Andreu, simulado
 
 *27-sep-2026. A partir de un audio suyo (su "paso a paso para la primera cuenta de fondeo y el
-primer payout"), dos capturas de sus reels y el inicio de su vídeo fijado (el sistema de entrada,
-del que tenemos el paso 1 de 3).*
+primer payout"), dos capturas de sus reels y la transcripción de su vídeo fijado (el sistema de
+entrada en 3 pasos, implementado como la estrategia `aleix`).*
 
 ## Su plan
 
@@ -95,32 +95,48 @@ fondeadas vinculadas a cursos: razón de más para verificarlo todo con backtest
    en ~2–3 semanas perdiendo poco valor). 1.000 $ solo si aceptas suspender más de la mitad.
 5. **Fondeada:** 250 $ @ 1,5R y retirar en cuanto lo permitan las reglas.
 
-## Su sistema de entrada (vídeo fijado): lo que tenemos
+## Su sistema de entrada (vídeo fijado): los 3 pasos
 
-La mayor parte del vídeo es presentación del "Vision Club" (su historia, testimonios de alumnos con
-retiros) y la estrategia se corta al empezar el **paso 1 de 3**:
+La mayor parte del vídeo es presentación del "Vision Club" (su historia, testimonios). La estrategia:
 
-> Paso 1: saber hacia dónde va el precio = la **draw on liquidity (DOL)**, el objetivo del precio.
-> Para determinarla: "¿qué FVG se están respetando y qué FVG no se están respetando?"
+1. **Dirección = draw on liquidity (DOL)**, en temporalidad mayor (15 min): "¿qué FVG se están
+   respetando y cuáles no?". Respetado = el precio vuelve (lo mitiga) y da un impulso hacia un nuevo
+   punto estructural; no respetado = el precio lo atraviesa. Si se respetan los bajistas y no los
+   alcistas, el objetivo es el **siguiente mínimo** estructural (y al revés).
+2. **Zona de reacción:** un FVG de 15 min a favor de esa dirección al que el precio vuelve en
+   retroceso ("entrar cuando el precio aún esté debajo, no arriba").
+3. **Confirmación en 1 min: IFVG.** Dentro de la zona, un FVG en contra que el precio "se come"
+   (cierra al otro lado): ahí entra, hacia el objetivo.
 
-**Implementado** como filtro de dirección `flujo_fvg` en la estrategia `fvg`
-(`cajanegra/strategies/fvg.py`, clase `FvgOrderFlow`), con tests:
+**Implementado como la estrategia `aleix`** (`cajanegra/strategies/aleix.py`), con tests que
+reproducen su ejemplo de venta vela a vela, el espejo de compra y los casos en que no debe operar.
 
-- FVG alcista **respetado** (el precio vuelve al hueco y la vela no cierra por debajo) → sesgo alcista.
-- FVG alcista **no respetado** (una vela cierra por debajo) → sesgo bajista. Simétrico para bajistas.
-- El sesgo lo marcan los últimos `flujo_eventos` eventos si coinciden; se mide en velas de
-  `flujo_timeframe_min` minutos (15 por defecto) y los FVG sin resolver caducan a los `flujo_dias` días.
+| Parámetro | Por defecto | Qué es |
+|---|---|---|
+| `htf_min` / `ltf_min` | 15 / 1 | Temporalidades de los pasos 1–2 y del paso 3 |
+| `zona_minutos` | 60 | Cuánto espera la confirmación tras tocar la zona |
+| `stop` | `extremo` | **Supuesto:** más allá del extremo del retroceso (alternativa `ifvg`: más allá del IFVG) |
+| `objetivo` / `objetivo_r` | `r` / 1,5 | 1,5R como en su challenge (alternativa `dol`: el siguiente punto estructural) |
+| `exigir_dol` | sí | Solo opera si el siguiente punto estructural está al menos a 1,5R |
+| `hora_limite_entrada` | 11:30 | Sesión de la mañana de Nueva York (él dedica ~2 h al día) |
+| `max_operaciones` | 1 | Una por día (su challenge busca 1 TP por día por la consistencia) |
 
 ```bash
-python -m cajanegra backtest --datos data/nq_1m.parquet --estrategia fvg \
-    --param filtro_tendencia=flujo_fvg --param direccion=ambas --param flujo_timeframe_min=15
+# su challenge: 1.000 $ de riesgo con minis de NQ, 1,5R, reglas de Topstep
+python -m cajanegra backtest --datos data/nq_1m.parquet --instrumento NQ --estrategia aleix \
+    --param riesgo_usd=1000 --param max_contratos=5 --reglas config/reglas/firmas/topstep_50k.toml
+# ¿qué variantes aguantan fuera de muestra?
+python -m cajanegra walkforward --datos data/nq_1m.parquet --instrumento NQ --estrategia aleix \
+    --grid stop=extremo,ifvg --grid objetivo_r=1,1.5,2 --grid zona_minutos=30,60,120
 ```
 
-Limitación: con datos solo de la sesión de Nueva York no vemos los FVG de la noche (Asia/Londres),
-que un trader ICT sí usa. Con datos de 24 h se puede ampliar.
+En datos sintéticos opera poco (≈ 1 de cada 8 sesiones con todos los filtros): encaja con sus
+"solo trades A+". Recordatorios: el estudio de MPM no encontró ventaja neta en el FVG solo, pero
+este sistema añade dirección de 15 min + zona + inversión en 1 min, así que merece su propia prueba;
+y con stops cortos los costes pesan (0,045–0,075 R por operación con minis, ver arriba).
 
-**Faltan los pasos 2 y 3** (previsiblemente: dónde esperar la entrada y qué la confirma). Si pegas el
-resto de la transcripción, los convierto en reglas igual que el paso 1.
+También existe el filtro `flujo_fvg` en la estrategia `fvg` (solo el paso 1), útil para probar la
+dirección de Aleix con otras entradas.
 
 ## Capturas: reglas de la cuenta fondeada
 
@@ -156,15 +172,17 @@ da cuántos de los "más de 150" alumnos cobran de forma sostenida. Frente a eso
 ~7 % de los traders de fondeo llega a cobrar y el 97 % de quienes hacen day trading durante más de
 300 días pierde dinero. No dice que su sistema no funcione; dice que hay que medirlo nosotros.
 
-## Lo que necesitamos de Aleix
+## Lo que falta por confirmar de su sistema
 
-El resto del vídeo fijado (pasos 2 y 3). Preguntas concretas:
+El vídeo se corta antes de estos detalles (están como parámetros con un supuesto razonable):
 
-1. ¿Qué opera exactamente: NQ, ES, micros? ¿En qué horario?
-2. ¿Qué es para él un mercado alcista y en qué temporalidad lo mira?
-3. ¿Qué FVG vale (temporalidad, tamaño, "el primero" desde qué hora)?
-4. ¿Dónde entra, dónde pone el stop (¿10–17 puntos de NQ?) y dónde el objetivo?
-5. ¿Qué días no opera (noticias, huecos...)?
+1. **Dónde pone el stop** (¿sobre el extremo del retroceso, sobre el IFVG, un número fijo de puntos?).
+2. **Cómo entra:** ¿a mercado al cerrar la vela que invierte, o con límite en el retesteo del IFVG?
+3. **Objetivo:** ¿siempre 1,5R/2R fijo, o el siguiente punto estructural (la DOL)?
+4. **Sesiones:** dice que sirve "en todas las sesiones"; ¿opera Londres y Asia o solo Nueva York?
+   (con datos de 24 h se puede probar).
+5. **El gráfico del S&P** que menciona: ¿lo usa para confirmar (divergencia SMT)?
+6. **Qué es un "trade A+"** en la cuenta fondeada.
 
 ## Reproducirlo
 

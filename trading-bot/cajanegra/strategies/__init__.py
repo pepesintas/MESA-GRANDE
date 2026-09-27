@@ -1,3 +1,4 @@
+from .aleix import AleixIFVG
 from .base import Strategy
 from .fvg import FirstFVG
 from .last_half_hour import LastHalfHourMomentum
@@ -9,6 +10,7 @@ STRATEGIES: dict[str, type[Strategy]] = {
     FirstFVG.name: FirstFVG,
     NoiseAreaMomentum.name: NoiseAreaMomentum,
     LastHalfHourMomentum.name: LastHalfHourMomentum,
+    AleixIFVG.name: AleixIFVG,
 }
 
 
@@ -21,6 +23,6 @@ def get_strategy(name: str, **params) -> Strategy:
 
 
 __all__ = [
-    "Strategy", "STRATEGIES", "get_strategy",
+    "Strategy", "STRATEGIES", "get_strategy", "AleixIFVG",
     "FirstFVG", "LastHalfHourMomentum", "NoiseAreaMomentum", "OpeningRangeBreakout",
 ]
