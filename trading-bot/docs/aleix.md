@@ -1,8 +1,8 @@
 # El plan de Aleix Andreu, simulado
 
-*27-sep-2026. A partir de la transcripción de un audio suyo (su "paso a paso para la primera
-cuenta de fondeo y el primer payout"). Este audio trata de la GESTIÓN de cuentas, no de su
-estrategia de entrada: esa la explica en el vídeo fijado de su perfil, que aún no tenemos.*
+*27-sep-2026. A partir de un audio suyo (su "paso a paso para la primera cuenta de fondeo y el
+primer payout"), dos capturas de sus reels y el inicio de su vídeo fijado (el sistema de entrada,
+del que tenemos el paso 1 de 3).*
 
 ## Su plan
 
@@ -95,10 +95,70 @@ fondeadas vinculadas a cursos: razón de más para verificarlo todo con backtest
    en ~2–3 semanas perdiendo poco valor). 1.000 $ solo si aceptas suspender más de la mitad.
 5. **Fondeada:** 250 $ @ 1,5R y retirar en cuanto lo permitan las reglas.
 
+## Su sistema de entrada (vídeo fijado): lo que tenemos
+
+La mayor parte del vídeo es presentación del "Vision Club" (su historia, testimonios de alumnos con
+retiros) y la estrategia se corta al empezar el **paso 1 de 3**:
+
+> Paso 1: saber hacia dónde va el precio = la **draw on liquidity (DOL)**, el objetivo del precio.
+> Para determinarla: "¿qué FVG se están respetando y qué FVG no se están respetando?"
+
+**Implementado** como filtro de dirección `flujo_fvg` en la estrategia `fvg`
+(`cajanegra/strategies/fvg.py`, clase `FvgOrderFlow`), con tests:
+
+- FVG alcista **respetado** (el precio vuelve al hueco y la vela no cierra por debajo) → sesgo alcista.
+- FVG alcista **no respetado** (una vela cierra por debajo) → sesgo bajista. Simétrico para bajistas.
+- El sesgo lo marcan los últimos `flujo_eventos` eventos si coinciden; se mide en velas de
+  `flujo_timeframe_min` minutos (15 por defecto) y los FVG sin resolver caducan a los `flujo_dias` días.
+
+```bash
+python -m cajanegra backtest --datos data/nq_1m.parquet --estrategia fvg \
+    --param filtro_tendencia=flujo_fvg --param direccion=ambas --param flujo_timeframe_min=15
+```
+
+Limitación: con datos solo de la sesión de Nueva York no vemos los FVG de la noche (Asia/Londres),
+que un trader ICT sí usa. Con datos de 24 h se puede ampliar.
+
+**Faltan los pasos 2 y 3** (previsiblemente: dónde esperar la entrada y qué la confirma). Si pegas el
+resto de la transcripción, los convierto en reglas igual que el paso 1.
+
+## Capturas: reglas de la cuenta fondeada
+
+Las capturas confirman la gestión del challenge (2 balas, 2 %, 1:1,5, dos TP de 1.500 $ con el
+50 % de consistencia) y añaden la de la fondeada: **solo trades A+, riesgo del 0,5–1 %, objetivo de
+llevar la cuenta a +4 % (+2.000 $)** antes de retirar (con el 50 % retirable salen ~1.000 $).
+
+Simulación (challenge de Aleix fijo, 1.500 trayectorias, Topstep y Alpha):
+
+| Fondeada | Ventaja +0,1 R: cobra / valor | Ventaja +0,2 R: cobra / valor |
+|---|---|---|
+| 0,5 % (250 $) @ 1,5R, retirar en cuanto se pueda | 30 % / 437 $ | 38 % / 996 $ |
+| 0,5 % @ 1,5R, esperar a +4 % (Aleix) | 21 % / 395 $ | 32 % / 976 $ |
+| 1 % (500 $) @ 1,5R, retirar en cuanto se pueda | 20 % / 442 $ | 27 % / 1.046 $ |
+| 1 % @ 1,5R, esperar a +4 % (Aleix) | 17 % / 434 $ | 24 % / 1.054 $ |
+
+*(Topstep; Alpha da cifras casi iguales. Con 2R todas las variantes salen algo peor que con 1,5R.)*
+
+- **Esperar a +4 % no cambia el valor esperado**: se cobra menos veces pero más cantidad. Dado el
+  riesgo de que la firma cierre o cambie reglas, **mejor retirar en cuanto se pueda**.
+- Su rango de **0,5–1 % es razonable**; el 0,5 % cobra más a menudo, el 1 % algo más de valor.
+- "Solo trades A+" significa operar menos y con más acierto: coherente con todo lo anterior, pero
+  solo el backtest dirá qué es un A+ en reglas.
+- Lo que más valor quita sigue siendo **el challenge con 2 balas**: con una ventaja real, pasar a
+  250 $ @ 1,5R en la evaluación sube el valor por cuenta de ~440 $ a ~580 $ (+0,1 R) y de ~1.050 $ a
+  ~1.640 $ (+0,2 R), a costa de tardar semanas en vez de días.
+
+## Sobre los testimonios
+
+Los casos del vídeo (retiros de 12.000–24.000 €, "cuatro payouts en dos meses") son los que
+salieron bien: él mismo dice que no todos los que aprenden la estrategia obtienen resultados, y no
+da cuántos de los "más de 150" alumnos cobran de forma sostenida. Frente a eso, las tasas generales:
+~7 % de los traders de fondeo llega a cobrar y el 97 % de quienes hacen day trading durante más de
+300 días pierde dinero. No dice que su sistema no funcione; dice que hay que medirlo nosotros.
+
 ## Lo que necesitamos de Aleix
 
-El vídeo fijado de su perfil explica su sistema de entrada. Transcríbelo como este audio y lo
-convierto en reglas. Preguntas concretas:
+El resto del vídeo fijado (pasos 2 y 3). Preguntas concretas:
 
 1. ¿Qué opera exactamente: NQ, ES, micros? ¿En qué horario?
 2. ¿Qué es para él un mercado alcista y en qué temporalidad lo mira?

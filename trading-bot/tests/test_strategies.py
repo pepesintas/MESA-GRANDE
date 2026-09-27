@@ -82,6 +82,7 @@ def test_unknown_param_rejected():
 @pytest.mark.parametrize("name,kw", [
     ("orb", {}),
     ("fvg", {"filtro_tendencia": "ninguno", "direccion": "ambas"}),
+    ("fvg", {"filtro_tendencia": "flujo_fvg", "direccion": "ambas", "flujo_timeframe_min": 5, "solo_primero": False}),
     ("zona_ruido", {}),
     ("zona_ruido", {"stop_continuo": True}),
     ("ultima_media_hora", {}),

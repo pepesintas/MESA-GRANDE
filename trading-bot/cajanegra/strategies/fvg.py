@@ -6,17 +6,103 @@ detalles son parámetros: cuando tengamos sus reglas exactas se ajustan aquí.
 
 FVG alcista (3 velas): mínimo de la vela 3 > máximo de la vela 1. La zona del hueco es
 [máximo vela 1, mínimo vela 3]. La vela 2 es el desplazamiento.
+
+Filtro `flujo_fvg` (paso 1 del sistema de Aleix: la "draw on liquidity" se deduce de qué FVG
+se respetan y cuáles no): ver `FvgOrderFlow`.
 """
 
 from __future__ import annotations
 
-import math
-
-import numpy as np
+from collections import deque
 
 from ..engine.orders import Order, OrderType, Side
 from .base import Strategy
 from .common import direction_allowed, size_for_risk
+
+
+def detect_fvg(c1, c2, c3, min_gap: float):
+    """(lado, fondo, techo, extremo de la vela 1) si las 3 velas forman un FVG; si no, None."""
+    (o1, h1, l1, _), (o2, _, _, cl2), (_, h3, l3, _) = c1, c2, c3
+    if l3 - h1 >= min_gap and cl2 > o2:
+        return (1, h1, l3, l1)       # alcista: zona [h1, l3], stop bajo la vela 1
+    if l1 - h3 >= min_gap and cl2 < o2:
+        return (-1, h3, l1, h1)      # bajista: zona [h3, l1], stop sobre la vela 1
+    return None
+
+
+class CandleBuilder:
+    """Velas de `tf` minutos alineadas con `start_min`, a partir de barras de 1 minuto."""
+
+    def __init__(self, tf: int, start_min: int):
+        self.tf, self.start = int(tf), int(start_min)
+
+    def update(self, ctx):
+        m = ctx.minute
+        if m < self.start or (m - self.start + 1) % self.tf != 0:
+            return None
+        sel = ctx.minutes >= m - self.tf + 1
+        o = ctx.opens[sel]
+        if len(o) == 0:
+            return None
+        return (float(o[0]), float(ctx.highs[sel].max()), float(ctx.lows[sel].min()), float(ctx.closes[sel][-1]))
+
+
+class FvgOrderFlow:
+    """Sesgo según qué FVG se respetan y cuáles no.
+
+    - FVG alcista respetado: el precio vuelve al hueco y la vela NO cierra por debajo → +1.
+    - FVG alcista no respetado: una vela cierra por debajo del hueco → −1.
+    - FVG bajista respetado → −1; no respetado (cierre por encima) → +1.
+    Sesgo = dirección de los últimos `events_needed` eventos si coinciden; si no, 0.
+    Los FVG sin resolver caducan tras `max_age_days` sesiones.
+    """
+
+    def __init__(self, min_gap: float, events_needed: int = 1, max_age_days: int = 3):
+        self.min_gap = min_gap
+        self.need = int(events_needed)
+        self.max_age = int(max_age_days)
+        self.fvgs: list[tuple[int, float, float, int]] = []
+        self.events: deque[int] = deque(maxlen=20)
+        self.candles: list[tuple] = []
+        self.day = 0
+
+    def new_day(self) -> None:
+        self.day += 1
+        self.candles = []
+        self.fvgs = [f for f in self.fvgs if self.day - f[3] <= self.max_age]
+
+    def on_candle(self, o: float, h: float, l: float, c: float) -> None:  # noqa: E741
+        keep = []
+        for f in self.fvgs:
+            side, bottom, top, _ = f
+            if side > 0:
+                if c < bottom:
+                    self.events.append(-1)
+                    continue
+                if l <= top:
+                    self.events.append(1)
+                    continue
+            else:
+                if c > top:
+                    self.events.append(1)
+                    continue
+                if h >= bottom:
+                    self.events.append(-1)
+                    continue
+            keep.append(f)
+        self.fvgs = keep
+        self.candles.append((o, h, l, c))
+        if len(self.candles) >= 3:
+            found = detect_fvg(*self.candles[-3:], self.min_gap)
+            if found is not None:
+                self.fvgs.append((found[0], found[1], found[2], self.day))
+
+    @property
+    def bias(self) -> int:
+        if len(self.events) < self.need:
+            return 0
+        last = list(self.events)[-self.need:]
+        return last[0] if all(e == last[0] for e in last) else 0
 
 
 class FirstFVG(Strategy):
@@ -24,8 +110,11 @@ class FirstFVG(Strategy):
     description = "Primer Fair Value Gap tras la apertura, a favor del sesgo del mercado"
     defaults = {
         "direccion": "largos",           # largos (mercado alcista) | cortos | ambas
-        "filtro_tendencia": "media_diaria",  # ninguno | media_diaria | cierre_anterior | apertura (combinables con +)
+        "filtro_tendencia": "media_diaria",  # ninguno | media_diaria | cierre_anterior | apertura | flujo_fvg (combinables con +)
         "media_dias": 20,
+        "flujo_timeframe_min": 15,       # flujo_fvg: velas en las que se miden los FVG respetados/no respetados
+        "flujo_eventos": 1,              # flujo_fvg: eventos seguidos en la misma dirección para fijar sesgo
+        "flujo_dias": 3,                 # flujo_fvg: días que sigue vivo un FVG sin resolver
         "timeframe_min": 1,              # velas de 1, 2, 3, 5... minutos para detectar el FVG
         "hora_inicio": "09:30",          # el patrón debe empezar a partir de esta hora
         "solo_primero": True,            # True: solo el primer FVG del día (válido o no)
@@ -42,7 +131,17 @@ class FirstFVG(Strategy):
         "max_contratos": 10,
     }
 
+    def __init__(self, **params):
+        super().__init__(**params)
+        self._flow: FvgOrderFlow | None = None
+
     def on_day_start(self, ctx):
+        if "flujo_fvg" in self._filters():
+            if self._flow is None:
+                self._flow = FvgOrderFlow(self.p["fvg_min_ticks"] * ctx.instrument.tick_size,
+                                          self.p["flujo_eventos"], self.p["flujo_dias"])
+            self._flow.new_day()
+            self._flow_builder = CandleBuilder(self.p["flujo_timeframe_min"], ctx.session_open_min)
         self.fvg = None          # (lado, fondo, techo, stop_ref)
         self.seen_first = False
         self.done = False
@@ -50,7 +149,7 @@ class FirstFVG(Strategy):
         self.start_min = ctx.to_min(self.p["hora_inicio"])
         self.limit_min = ctx.to_min(self.p["hora_limite_entrada"])
         self.exit_min = ctx.to_min(self.p["hora_salida"])
-        self.tf = int(self.p["timeframe_min"])
+        self._entry_builder = CandleBuilder(self.p["timeframe_min"], self.start_min)
         self.candles: list[tuple[float, float, float, float]] = []
 
     def _filters(self) -> list[str]:
@@ -77,31 +176,22 @@ class FirstFVG(Strategy):
                     return False
             if f == "apertura" and (ctx.c - ctx.opens[0]) * side <= 0:
                 return False
+            if f == "flujo_fvg" and (self._flow is None or self._flow.bias != side):
+                return False
         return True
 
     def _new_candle(self, ctx) -> bool:
         """Cierra una vela de `timeframe_min` minutos si esta barra completa el bloque."""
-        m = ctx.minute
-        if m < self.start_min or (m - self.start_min + 1) % self.tf != 0:
+        candle = self._entry_builder.update(ctx)
+        if candle is None:
             return False
-        block_start = m - self.tf + 1
-        sel = ctx.minutes >= block_start
-        o = ctx.opens[sel]
-        if len(o) == 0:
-            return False
-        self.candles.append((float(o[0]), float(ctx.highs[sel].max()), float(ctx.lows[sel].min()), float(ctx.closes[sel][-1])))
+        self.candles.append(candle)
         return True
 
     def _detect(self, ctx):
         if len(self.candles) < 3:
             return None
-        (o1, h1, l1, c1), (o2, h2, l2, c2), (o3, h3, l3, c3) = self.candles[-3:]
-        min_gap = self.p["fvg_min_ticks"] * ctx.instrument.tick_size
-        if l3 - h1 >= min_gap and c2 > o2:
-            return (1, h1, l3, l1)       # alcista: zona [h1, l3], stop bajo la vela 1
-        if l1 - h3 >= min_gap and c2 < o2:
-            return (-1, h3, l1, h1)      # bajista: zona [h3, l1], stop sobre la vela 1
-        return None
+        return detect_fvg(*self.candles[-3:], self.p["fvg_min_ticks"] * ctx.instrument.tick_size)
 
     def _order(self, ctx, side, bottom, top, stop_ref):
         inst = ctx.instrument
@@ -131,6 +221,10 @@ class FirstFVG(Strategy):
                      expires_min=self.limit_min, tag="fvg")
 
     def on_bar(self, ctx):
+        if self._flow is not None:
+            candle = self._flow_builder.update(ctx)
+            if candle is not None:
+                self._flow.on_candle(*candle)
         m = ctx.minute
         pos = ctx.position
         if pos is not None:

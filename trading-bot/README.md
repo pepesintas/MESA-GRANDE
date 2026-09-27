@@ -87,8 +87,8 @@ desplazamiento). Con los valores por defecto: solo largos cuando el cierre de ay
 sobre la media de 20 días, se toma el **primer** FVG tras las 09:30 (hora de Nueva York),
 entrada límite en el borde del hueco, stop bajo la vela 1, objetivo 2R, sin entradas
 después de las 11:00. Todo es parametrizable (`timeframe_min`, `entrada=medio`,
-`stop=fvg`, `filtro_tendencia=media_diaria+apertura`, ...). **Hay que ajustarlo a sus
-reglas exactas** en cuanto las tengamos.
+`stop=fvg`, `filtro_tendencia=media_diaria+apertura`, ...). El filtro `flujo_fvg` implementa
+el paso 1 de su sistema (dirección según qué FVG se respetan y cuáles no). Faltan los pasos 2 y 3.
 
 **`orb` — ruptura del rango de apertura.** Referencia pública (Zarattini & Aziz, 2023)
 para tener siempre un punto de comparación.
