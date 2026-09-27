@@ -79,13 +79,19 @@ def test_unknown_param_rejected():
         get_strategy("fvg", parametro_inventado=1)
 
 
-@pytest.mark.parametrize("name,kw", [("orb", {}), ("fvg", {"filtro_tendencia": "ninguno", "direccion": "ambas"})])
+@pytest.mark.parametrize("name,kw", [
+    ("orb", {}),
+    ("fvg", {"filtro_tendencia": "ninguno", "direccion": "ambas"}),
+    ("zona_ruido", {}),
+    ("zona_ruido", {"stop_continuo": True}),
+    ("ultima_media_hora", {}),
+])
 def test_no_edge_on_random_walk(name, kw):
-    """Detector de lookahead: en un paseo aleatorio el resultado bruto medio debe ser ~0R.
-    Un motor que 've el futuro' daría un resultado claramente positivo."""
+    """Detector de lookahead: en un paseo aleatorio el resultado bruto medio debe ser ~0.
+    Un motor o una estrategia que 'vea el futuro' daría un resultado claramente positivo."""
     bars = generate_synthetic_bars(days=1200, seed=3)
     res = Backtester(bars, MNQ, costs=NO_SLIP).run(get_strategy(name, **kw))
-    r = res.trades["pnl_bruto"] / res.trades["riesgo_usd"]
-    se = r.std(ddof=1) / np.sqrt(len(r))
-    assert len(r) > 500
-    assert r.mean() < 3 * se, f"ventaja sospechosa en datos aleatorios: {r.mean():.3f}R (se {se:.3f})"
+    g = res.trades["pnl_bruto"]
+    se = g.std(ddof=1) / np.sqrt(len(g))
+    assert len(g) > 500
+    assert g.mean() < 3 * se, f"ventaja sospechosa en datos aleatorios: {g.mean():.2f} $ (se {se:.2f})"

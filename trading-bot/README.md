@@ -93,6 +93,14 @@ reglas exactas** en cuanto las tengamos.
 **`orb` — ruptura del rango de apertura.** Referencia pública (Zarattini & Aziz, 2023)
 para tener siempre un punto de comparación.
 
+**`zona_ruido` — momentum intradía por zona de ruido** (Zarattini, Aziz y Barbon, 2024; aplicado
+a NQ/ES por Quantitativo). La estrategia con mejor evidencia y mejor encaje con las firmas.
+
+**`ultima_media_hora` — momentum de la última media hora** (Gao et al. 2018; Baltussen et al.
+2021, más de 60 futuros). Opera a las 15:30 en la dirección del resto del día.
+
+Evidencia, perfiles y orden de pruebas: [`docs/estrategias.md`](docs/estrategias.md).
+
 ### Añadir una estrategia (p. ej. de un creador de contenido)
 
 1. Escribe las reglas **sin ambigüedad**: sesgo, qué patrón, dónde entra, dónde va el stop,
@@ -137,7 +145,7 @@ copia las vigentes de la tuya antes de fiarte de nada.
 |---|---|---|
 | 1. Laboratorio | Motor, reglas de fondeo, evaluación, walk-forward, ORB, FVG | ✅ hecho |
 | 2. Datos reales | 8–10 años de NQ/ES en 1 minuto + calendario histórico de noticias | siguiente |
-| 3. Estrategias | Codificar las reglas exactas de Aleix y otras; validar fuera de muestra | |
+| 3. Estrategias | Zona de ruido y última media hora programadas; faltan reglas exactas de Aleix y datos reales | en curso |
 | 4. Copiloto | Señales en tiempo real por Telegram (entrada, stop, objetivo, tamaño) + informe premercado con noticias | |
 | 5. Papel | 1–2 meses en demo comparando real vs. backtest | |
 | 6. Fondeo | 1 evaluación, modo copiloto o automático **si la firma lo permite** | |
