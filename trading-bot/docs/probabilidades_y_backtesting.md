@@ -49,7 +49,7 @@ Se irá sustituyendo por números reales en cuanto tengamos backtests con datos 
 | … y cobrar al menos una vez en 6 meses | **~35 %** por cuenta | Idem. Valor esperado ≈ +400–600 $ por cuenta. |
 | Sin ventaja: cobrar por suerte | ~17–21 % por cuenta | Pero el valor esperado ronda 0: es apostar. |
 
-**En conjunto:** ~15–25 % de que el proyecto acabe en una operativa rentable con cuentas de
+**En conjunto:** ~12–25 % (25–40 % × 50–60 %) de que el proyecto acabe en una operativa rentable con cuentas de
 fondeo en el primer año, frente al ~7 % de los traders que llega a cobrar. Y un **75–85 %** de que
 el laboratorio concluya que no hay ventaja suficiente **antes** de gastar en cuentas: ese
 resultado también es valioso, porque ahorra dinero. Varias cuentas con la misma estrategia no
