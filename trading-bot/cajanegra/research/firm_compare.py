@@ -58,6 +58,12 @@ def simulate_days(model: EdgeModel, risk_usd: float, n_paths: int, n_days: int, 
     return out
 
 
+def _row_fn(arr: np.ndarray):
+    seq = [tuple(x) for x in arr.tolist()]
+    n = len(seq)
+    return lambda t: seq[t] if t < n else None
+
+
 def compare_firms(
     firms: dict[str, FirmConfig],
     edges: list[float],
@@ -67,20 +73,27 @@ def compare_firms(
     payoff_r: float = 2.0,
     prob_operar: float = 0.85,
     seed: int = 0,
+    risk_funded: float | None = None,
+    payoff_funded: float | None = None,
 ) -> pd.DataFrame:
+    """`risks` y `payoff_r` se aplican a la evaluación; si se indica `risk_funded` y/o
+    `payoff_funded`, la cuenta fondeada se opera con esos valores (misma ventaja en R)."""
     phases = max(len(f.fases) for f in firms.values()) + 1
+    split = risk_funded is not None or payoff_funded is not None
     rows = []
     for e in edges:
         model = EdgeModel(esperanza_r=e, payoff_r=payoff_r, prob_operar=prob_operar)
+        funded_model = EdgeModel(esperanza_r=e, payoff_r=payoff_funded or payoff_r, prob_operar=prob_operar)
         for risk in risks:
             days = simulate_days(model, risk, n_paths, horizon * phases, seed=seed)
+            fdays = (simulate_days(funded_model, risk_funded or risk, n_paths, horizon * phases, seed=seed + 1)
+                     if split else None)
             paths_per_firm = {name: [] for name in firms}
             for i in range(n_paths):
-                seq = [tuple(x) for x in days[i].tolist()]
-                n = len(seq)
-                row = lambda t, seq=seq, n=n: seq[t] if t < n else None  # noqa: E731
+                row = _row_fn(days[i])
+                frow = _row_fn(fdays[i]) if split else None
                 for name, firm in firms.items():
-                    paths_per_firm[name].append(simulate_path(row, firm, horizon))
+                    paths_per_firm[name].append(simulate_path(row, firm, horizon, row_funded=frow))
             for name, paths in paths_per_firm.items():
                 s = summarize(pd.DataFrame(paths))
                 rows.append({

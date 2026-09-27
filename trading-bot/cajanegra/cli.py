@@ -201,8 +201,12 @@ def cmd_comparar_firmas(args):
     risks = [float(x) for x in args.riesgo.split(",")]
     print(f"Comparando {len(firms)} firmas · ventajas {edges} R · riesgos {risks} $ · "
           f"{args.simulaciones} trayectorias · {args.horizonte} sesiones por fase\n")
+    if args.riesgo_fondeada or args.payoff_fondeada:
+        print(f"Fondeada operada aparte: riesgo {args.riesgo_fondeada or 'igual'} $, "
+              f"payoff {args.payoff_fondeada or args.payoff} R\n")
     table = compare_firms(firms, edges, risks, n_paths=args.simulaciones, horizon=args.horizonte,
-                          payoff_r=args.payoff, prob_operar=args.prob_operar, seed=args.semilla)
+                          payoff_r=args.payoff, prob_operar=args.prob_operar, seed=args.semilla,
+                          risk_funded=args.riesgo_fondeada, payoff_funded=args.payoff_fondeada)
     best = best_by_firm(table)
     for e, grp in best.groupby("esperanza_r", sort=True):
         print(f"Ventaja {e:+.2f} R por operación (mejor riesgo para cada firma):")
@@ -311,6 +315,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--esperanza", default="-0.05,0,0.05,0.1,0.15,0.2,0.3", help="ventajas en R por operación")
     sp.add_argument("--riesgo", default="100,150,200,250,350,500,750", help="riesgos por operación en USD")
     sp.add_argument("--payoff", type=float, default=2.0, help="R que gana un acierto")
+    sp.add_argument("--riesgo-fondeada", type=float, help="riesgo por operación en la fondeada (si es distinto)")
+    sp.add_argument("--payoff-fondeada", type=float, help="R que gana un acierto en la fondeada (si es distinto)")
     sp.add_argument("--prob-operar", type=float, default=0.85, help="probabilidad de operar cada día")
     sp.add_argument("--simulaciones", type=int, default=1000)
     sp.add_argument("--horizonte", type=int, default=120, help="sesiones máximas por fase y en la fondeada")

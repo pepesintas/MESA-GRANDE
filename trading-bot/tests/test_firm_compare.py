@@ -40,3 +40,13 @@ def test_cli_compare(capsys):
     main(["comparar-firmas", "--esperanza", "0.1", "--riesgo", "250", "--simulaciones", "30", "--horizonte", "40"])
     out = capsys.readouterr().out
     assert "VALOR ESPERADO" in out and "Topstep" in out
+
+
+def test_funded_phase_can_use_different_risk():
+    firms = {c.nombre: c for c in (FirmConfig.from_toml(f) for f in ["config/reglas/firmas/topstep_50k.toml"])}
+    same = compare_firms(firms, edges=[0.2], risks=[1000], n_paths=200, horizon=60, payoff_r=1.5, seed=4)
+    split = compare_firms(firms, edges=[0.2], risks=[1000], n_paths=200, horizon=60, payoff_r=1.5, seed=4,
+                          risk_funded=350, payoff_funded=2.0)
+    # la evaluación es idéntica (mismos días); solo cambia lo que pasa en la fondeada
+    assert same.iloc[0].p_aprobar == split.iloc[0].p_aprobar
+    assert same.iloc[0].valor_esperado != split.iloc[0].valor_esperado

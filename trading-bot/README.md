@@ -100,6 +100,7 @@ a NQ/ES por Quantitativo). La estrategia con mejor evidencia y mejor encaje con 
 2021, más de 60 futuros). Opera a las 15:30 en la dirección del resto del día.
 
 Evidencia, perfiles y orden de pruebas: [`docs/estrategias.md`](docs/estrategias.md).
+El plan de gestión de cuentas de Aleix, simulado: [`docs/aleix.md`](docs/aleix.md).
 
 ### Añadir una estrategia (p. ej. de un creador de contenido)
 

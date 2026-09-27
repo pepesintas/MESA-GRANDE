@@ -1,0 +1,33 @@
+# Alpha Futures · Standard 50K. Revisado: 27-sep-2026.
+# ⚠ BOTS PROHIBIDOS en todas las cuentas (oficial): solo modo copiloto (el bot avisa, tú ejecutas).
+nombre = "Alpha Futures Standard 50K"
+aviso = "Reglas recopiladas el 27-sep-2026. Alpha prohíbe bots: solo modo copiloto. Verifica en help.alpha-futures.com."
+
+[[fase]]
+nombre = "Evaluación Standard"
+capital_inicial = 50000
+objetivo_beneficio = 3000          # (terceros)
+drawdown_maximo = 2000             # (oficial) 4 % al cierre del día
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0               # (supuesto)
+consistencia_max_dia = 0.5         # (oficial) Standard: 50 %
+max_contratos = 5                  # (supuesto)
+
+[fondeada]
+nombre = "Qualified"
+capital_inicial = 50000
+objetivo_beneficio = 0.01          # (oficial) retiro cada 5 días ganadores de ≥ 200 $
+objetivo_ciclo = 0.01
+dias_ganadores_minimos = 5
+ganancia_minima_dia = 200
+drawdown_maximo = 2000             # (oficial) el suelo se mantiene tras retirar
+tipo_drawdown = "trailing_cierre"
+bloqueo_drawdown = 0               # (supuesto)
+max_contratos = 5
+
+[economia]
+coste_evaluacion = 129             # (terceros) mensual "desde"; verificar
+cobro_evaluacion = "mensual"
+coste_activacion = 0               # (terceros) sin cuota en Qualified
+reparto = 0.9                      # (oficial)
+retiro_fraccion = 0.5              # (oficial) hasta el 50 % del beneficio por retiro

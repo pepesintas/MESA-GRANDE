@@ -34,11 +34,19 @@ def _run_account(rules: AccountRules, row: Callable[[int], tuple | None], t0: in
 
 
 def simulate_path(
-    row: Callable[[int], tuple | None], firm: FirmConfig, horizon: int = 120, max_payouts: int | None = None
+    row: Callable[[int], tuple | None],
+    firm: FirmConfig,
+    horizon: int = 120,
+    max_payouts: int | None = None,
+    row_funded: Callable[[int], tuple | None] | None = None,
 ) -> dict:
     """Recorre las fases de evaluación y, si se aprueban, opera la cuenta fondeada `horizon`
-    sesiones retirando cada vez que las reglas lo permiten (o hasta `max_payouts` retiros)."""
+    sesiones retirando cada vez que las reglas lo permiten (o hasta `max_payouts` retiros).
+
+    `row_funded`: días de la fase fondeada si se opera distinto que en la evaluación
+    (p. ej. riesgo agresivo para aprobar y prudente una vez fondeado)."""
     eco = firm.economia
+    funded_row = row_funded or row
     t = 0
     for fase in firm.fases:
         acc, t_end, status = _run_account(fase, row, t, horizon)
@@ -64,7 +72,7 @@ def simulate_path(
     acc = PropAccount(firm.fondeada)
     paid, n, u = 0.0, 0, 0
     while u < horizon:
-        r = row(t + u)
+        r = funded_row(t + u)
         if r is None:
             out.update(resultado="sin_datos", sesiones_fondeada=u, n_retiros=n, retiro=paid, neto=paid - coste)
             return out
@@ -95,14 +103,27 @@ def _rows(days: pd.DataFrame) -> list[tuple]:
     return list(days[_COLS].itertuples(index=False, name=None))
 
 
-def rolling_starts(days: pd.DataFrame, firm: FirmConfig, horizon: int = 120, step: int = 1) -> pd.DataFrame:
+def _aligned(days: pd.DataFrame, days_funded: pd.DataFrame | None) -> list[tuple] | None:
+    if days_funded is None:
+        return None
+    if len(days_funded) != len(days) or not (days_funded["fecha"].values == days["fecha"].values).all():
+        raise ValueError("days_funded debe cubrir exactamente las mismas sesiones que days")
+    return _rows(days_funded)
+
+
+def rolling_starts(
+    days: pd.DataFrame, firm: FirmConfig, horizon: int = 120, step: int = 1, days_funded: pd.DataFrame | None = None
+) -> pd.DataFrame:
     """Una simulación por cada posible día de inicio real (cada `step` sesiones). Los caminos que se
-    quedan sin historia antes de terminar se descartan."""
+    quedan sin historia antes de terminar se descartan. `days_funded`: backtest de las mismas
+    sesiones operado como en la fondeada (p. ej. con menos riesgo)."""
     rows = _rows(days)
+    frows = _aligned(days, days_funded)
     n = len(rows)
     out = []
     for s in range(0, n, step):
-        res = simulate_path(lambda t, s=s: rows[s + t] if s + t < n else None, firm, horizon)
+        frow = (lambda t, s=s: frows[s + t] if s + t < n else None) if frows else None
+        res = simulate_path(lambda t, s=s: rows[s + t] if s + t < n else None, firm, horizon, row_funded=frow)
         res["inicio"] = days["fecha"].iloc[s]
         out.append(res)
     df = pd.DataFrame(out)
@@ -110,9 +131,11 @@ def rolling_starts(days: pd.DataFrame, firm: FirmConfig, horizon: int = 120, ste
 
 
 def block_bootstrap(
-    days: pd.DataFrame, firm: FirmConfig, n_sims: int = 2000, block: int = 5, horizon: int = 120, seed: int | None = 0
+    days: pd.DataFrame, firm: FirmConfig, n_sims: int = 2000, block: int = 5, horizon: int = 120,
+    seed: int | None = 0, days_funded: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     rows = _rows(days)
+    frows = _aligned(days, days_funded)
     n = len(rows)
     if n == 0:
         return pd.DataFrame()
@@ -124,7 +147,8 @@ def block_bootstrap(
         starts = rng.integers(0, max(1, n - block + 1), size=n_blocks)
         seq = (starts[:, None] + np.arange(block)[None, :]).ravel()[:total]
         seq = np.minimum(seq, n - 1)
-        out.append(simulate_path(lambda t, seq=seq: rows[seq[t]] if t < total else None, firm, horizon))
+        frow = (lambda t, seq=seq: frows[seq[t]] if t < total else None) if frows else None
+        out.append(simulate_path(lambda t, seq=seq: rows[seq[t]] if t < total else None, firm, horizon, row_funded=frow))
     return pd.DataFrame(out)
 
 

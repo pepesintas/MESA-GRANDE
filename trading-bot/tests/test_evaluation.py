@@ -67,3 +67,17 @@ def test_rolling_drops_censored_paths_and_bootstrap_is_reproducible():
     b2 = summarize(block_bootstrap(d, FIRM, n_sims=200, seed=1, horizon=30))
     assert b1 == b2
     assert 0 <= b1["p_retiro"] <= b1["p_aprobar"] <= 1
+
+
+def test_rolling_and_bootstrap_with_separate_funded_days():
+    d = days_df([400, -200, 300, 500, -100, 600, 200, -300, 400, 500] * 6)
+    safer = d.assign(pnl=d["pnl"] / 2, min_equity=d["min_equity"] / 2, max_equity=d["max_equity"] / 2,
+                     dd_intradia=d["dd_intradia"] / 2)
+    a = summarize(rolling_starts(d, FIRM, horizon=20))
+    b = summarize(rolling_starts(d, FIRM, horizon=20, days_funded=safer))
+    assert a["p_aprobar"] == b["p_aprobar"]              # la evaluación usa los mismos días
+    assert a["cobrado_medio_si_cobra"] != b["cobrado_medio_si_cobra"]
+    boot = summarize(block_bootstrap(d, FIRM, n_sims=100, horizon=20, seed=2, days_funded=safer))
+    assert boot["simulaciones"] == 100
+    with pytest.raises(ValueError):
+        rolling_starts(d, FIRM, days_funded=safer.iloc[:-1])
