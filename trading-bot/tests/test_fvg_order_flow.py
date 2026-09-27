@@ -70,3 +70,15 @@ def test_strategy_trades_long_when_order_flow_is_bullish():
 
 def test_strategy_skips_long_when_order_flow_is_bearish():
     assert run(_day(100.0, 100.75)).trades.empty
+
+
+def test_impulse_mode_waits_for_price_to_leave_the_gap():
+    touch_only = BULL + [(104.5, 104.6, 102.0, 102.3)]    # toca y cierra dentro del hueco
+    assert flow_after(touch_only).bias == 0                # modo impulso: aún no está respetado
+    f = FvgOrderFlow(min_gap=1.0, mode="toque")
+    f.new_day()
+    for c in touch_only:
+        f.on_candle(*c)
+    assert f.bias == 1                                     # modo toque: ya cuenta
+    g = flow_after(touch_only + [(102.3, 104.0, 102.2, 103.5)])  # después cierra por encima: impulso
+    assert g.bias == 1

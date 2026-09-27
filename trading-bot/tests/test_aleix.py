@@ -44,7 +44,7 @@ def mirror(rows):
 
 
 def run(rows, prev=None, **kw):
-    params = dict(htf_min=3, exigir_dol=False) | kw
+    params = dict(htf_min=3, exigir_dol=False, objetivo="r") | kw
     bars = make_days([prev, rows]) if prev else make_bars(rows)
     return Backtester(bars, MNQ, costs=CostModel(slippage_ticks=0)).run(AleixIFVG(**params))
 
@@ -82,3 +82,13 @@ def test_needs_room_to_the_draw_on_liquidity():
 
 def test_no_trade_when_bearish_fvgs_are_not_respected():
     assert run(sell_day(c4_close=199.5)).trades.empty  # el FVG bajista se invalida: dirección alcista
+
+
+def test_default_takes_profit_at_the_draw_on_liquidity_with_minimum_ratio():
+    prev = [(182, 183, 180, 181)] * 5
+    day = sell_day(a_low=188.8)[:-4] + [(184.8, 185, 179.5, 180.2), (180.2, 180.5, 180, 180.3)]
+    bars = make_days([prev, day])
+    res = Backtester(bars, MNQ, costs=CostModel(slippage_ticks=0)).run(AleixIFVG(htf_min=3))
+    t = res.trades.iloc[0]
+    # objetivo = mínimo de ayer (siguiente punto estructural), ratio 10 / 3,5 ≈ 2,9 ≥ 1,5
+    assert t.motivo == "objetivo" and t.precio_salida == 180.0

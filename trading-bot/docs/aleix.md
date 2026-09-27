@@ -99,35 +99,41 @@ fondeadas vinculadas a cursos: razón de más para verificarlo todo con backtest
 
 La mayor parte del vídeo es presentación del "Vision Club" (su historia, testimonios). La estrategia:
 
-1. **Dirección = draw on liquidity (DOL)**, en temporalidad mayor (15 min): "¿qué FVG se están
-   respetando y cuáles no?". Respetado = el precio vuelve (lo mitiga) y da un impulso hacia un nuevo
-   punto estructural; no respetado = el precio lo atraviesa. Si se respetan los bajistas y no los
-   alcistas, el objetivo es el **siguiente mínimo** estructural (y al revés).
-2. **Zona de reacción:** un FVG de 15 min a favor de esa dirección al que el precio vuelve en
-   retroceso ("entrar cuando el precio aún esté debajo, no arriba").
-3. **Confirmación en 1 min: IFVG.** Dentro de la zona, un FVG en contra que el precio "se come"
-   (cierra al otro lado): ahí entra, hacia el objetivo.
+1. **Dirección = draw on liquidity (DOL)**, en temporalidad mayor (**15 min o 1 h**): "¿qué FVG se
+   están respetando y cuáles no?". Respetado = el precio lo mitiga **y da un impulso** hacia un
+   nuevo punto estructural; no respetado = el precio lo atraviesa ("se lo revienta"). Si se
+   respetan los bajistas y no los alcistas, el objetivo son **los mínimos de esa temporalidad**
+   (y al revés).
+2. **Zona de reacción:** un FVG de esa temporalidad a favor de la dirección al que el precio vuelve
+   en retroceso ("entrar cuando el precio aún esté debajo, no arriba").
+3. **Confirmación en 1 min (a veces 30 s): IFVG.** Dentro de la zona, un FVG en contra que el precio
+   "se come": ahí entra, **"con el stop loss debajo y el take profit en el objetivo"**. Operaciones
+   rápidas (en su ejemplo, 3 minutos): "SL o TP".
 
 **Implementado como la estrategia `aleix`** (`cajanegra/strategies/aleix.py`), con tests que
 reproducen su ejemplo de venta vela a vela, el espejo de compra y los casos en que no debe operar.
 
 | Parámetro | Por defecto | Qué es |
 |---|---|---|
-| `htf_min` / `ltf_min` | 15 / 1 | Temporalidades de los pasos 1–2 y del paso 3 |
+| `htf_min` / `ltf_min` | 15 / 1 | Temporalidades de los pasos 1–2 (él usa 15 min o 1 h) y del paso 3 |
+| `respeto` | `impulso` | FVG respetado = lo mitiga y después cierra al otro lado a favor (`toque`: basta con tocarlo) |
 | `zona_minutos` | 60 | Cuánto espera la confirmación tras tocar la zona |
-| `stop` | `extremo` | **Supuesto:** más allá del extremo del retroceso (alternativa `ifvg`: más allá del IFVG) |
-| `objetivo` / `objetivo_r` | `r` / 1,5 | 1,5R como en su challenge (alternativa `dol`: el siguiente punto estructural) |
-| `exigir_dol` | sí | Solo opera si el siguiente punto estructural está al menos a 1,5R |
+| `stop` | `extremo` | **Supuesto** para su "stop debajo": más allá del extremo del retroceso (alternativa `ifvg`: más allá del IFVG) |
+| `objetivo` | `dol` | **Take profit en el objetivo** (máximos/mínimos de la temporalidad mayor o de ayer). `r`: fijo, como en su challenge |
+| `objetivo_r` / `exigir_dol` | 1,5 / sí | Ratio mínimo hasta el objetivo para aceptar la operación (y ratio del objetivo fijo) |
 | `hora_limite_entrada` | 11:30 | Sesión de la mañana de Nueva York (él dedica ~2 h al día) |
 | `max_operaciones` | 1 | Una por día (su challenge busca 1 TP por día por la consistencia) |
 
 ```bash
-# su challenge: 1.000 $ de riesgo con minis de NQ, 1,5R, reglas de Topstep
+# su sistema tal cual (objetivo en la DOL) con el riesgo de su challenge
 python -m cajanegra backtest --datos data/nq_1m.parquet --instrumento NQ --estrategia aleix \
     --param riesgo_usd=1000 --param max_contratos=5 --reglas config/reglas/firmas/topstep_50k.toml
+# su challenge literal: objetivo fijo 1,5R
+python -m cajanegra backtest --datos data/nq_1m.parquet --instrumento NQ --estrategia aleix \
+    --param objetivo=r --param riesgo_usd=1000 --param max_contratos=5
 # ¿qué variantes aguantan fuera de muestra?
 python -m cajanegra walkforward --datos data/nq_1m.parquet --instrumento NQ --estrategia aleix \
-    --grid stop=extremo,ifvg --grid objetivo_r=1,1.5,2 --grid zona_minutos=30,60,120
+    --grid htf_min=15,60 --grid stop=extremo,ifvg --grid objetivo=dol,r --grid zona_minutos=30,60,120
 ```
 
 En datos sintéticos opera poco (≈ 1 de cada 8 sesiones con todos los filtros): encaja con sus
@@ -137,6 +143,11 @@ y con stops cortos los costes pesan (0,045–0,075 R por operación con minis, v
 
 También existe el filtro `flujo_fvg` en la estrategia `fvg` (solo el paso 1), útil para probar la
 dirección de Aleix con otras entradas.
+
+**Validación con sus propios ejemplos:** muestra operaciones tomadas en directo el **26 y 28 de
+agosto y el 8 de septiembre** (una venta y dos compras). Con datos reales de esos días, el primer
+test será comprobar que el bot marca la misma dirección, la misma zona y el mismo IFVG que él. Si no
+coinciden, se ajustan los parámetros antes de mirar ningún resultado.
 
 ## Capturas: reglas de la cuenta fondeada
 
@@ -174,15 +185,15 @@ da cuántos de los "más de 150" alumnos cobran de forma sostenida. Frente a eso
 
 ## Lo que falta por confirmar de su sistema
 
-El vídeo se corta antes de estos detalles (están como parámetros con un supuesto razonable):
+Resuelto con la última parte del vídeo: el objetivo es la DOL (no un R fijo), la dirección se mira
+en 15 min o 1 h, y "respetar" incluye el impulso posterior. Queda:
 
-1. **Dónde pone el stop** (¿sobre el extremo del retroceso, sobre el IFVG, un número fijo de puntos?).
+1. **Dónde exactamente va el stop "debajo":** ¿del IFVG, del mínimo del retroceso, de la zona?
 2. **Cómo entra:** ¿a mercado al cerrar la vela que invierte, o con límite en el retesteo del IFVG?
-3. **Objetivo:** ¿siempre 1,5R/2R fijo, o el siguiente punto estructural (la DOL)?
-4. **Sesiones:** dice que sirve "en todas las sesiones"; ¿opera Londres y Asia o solo Nueva York?
-   (con datos de 24 h se puede probar).
-5. **El gráfico del S&P** que menciona: ¿lo usa para confirmar (divergencia SMT)?
-6. **Qué es un "trade A+"** en la cuenta fondeada.
+3. **Sesiones:** dice que sirve a cualquier hora; ¿opera Londres y Asia o solo Nueva York?
+   (con datos de 24 h se puede probar; las velas de 30 s requieren datos por segundos).
+4. **El gráfico del S&P** que menciona: ¿lo usa para confirmar (divergencia SMT)?
+5. **Qué es un "trade A+"** en la cuenta fondeada.
 
 ## Reproducirlo
 

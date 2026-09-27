@@ -50,18 +50,23 @@ class CandleBuilder:
 class FvgOrderFlow:
     """Sesgo según qué FVG se respetan y cuáles no.
 
-    - FVG alcista respetado: el precio vuelve al hueco y la vela NO cierra por debajo → +1.
+    - FVG alcista respetado → +1. Con `mode="impulso"` (Aleix: "mitiga el FVG y da un impulso
+      hacia un nuevo punto estructural"): el precio vuelve al hueco y después una vela cierra por
+      encima de él. Con `mode="toque"`: basta con volver al hueco sin cerrar por debajo.
     - FVG alcista no respetado: una vela cierra por debajo del hueco → −1.
-    - FVG bajista respetado → −1; no respetado (cierre por encima) → +1.
+    - FVG bajista: simétrico (respetado → −1; no respetado, cierre por encima → +1).
     Sesgo = dirección de los últimos `events_needed` eventos si coinciden; si no, 0.
     Los FVG sin resolver caducan tras `max_age_days` sesiones.
     """
 
-    def __init__(self, min_gap: float, events_needed: int = 1, max_age_days: int = 3):
+    def __init__(self, min_gap: float, events_needed: int = 1, max_age_days: int = 3, mode: str = "impulso"):
+        if mode not in ("impulso", "toque"):
+            raise ValueError("mode debe ser 'impulso' o 'toque'")
         self.min_gap = min_gap
         self.need = int(events_needed)
         self.max_age = int(max_age_days)
-        self.fvgs: list[tuple[int, float, float, int]] = []
+        self.mode = mode
+        self.fvgs: list[list] = []   # [lado, fondo, techo, día, tocado]
         self.events: deque[int] = deque(maxlen=20)
         self.candles: list[tuple] = []
         self.day = 0
@@ -74,28 +79,24 @@ class FvgOrderFlow:
     def on_candle(self, o: float, h: float, l: float, c: float) -> None:  # noqa: E741
         keep = []
         for f in self.fvgs:
-            side, bottom, top, _ = f
-            if side > 0:
-                if c < bottom:
-                    self.events.append(-1)
+            side, bottom, top, _, touched = f
+            if (side > 0 and c < bottom) or (side < 0 and c > top):
+                self.events.append(-side)          # no respetado: lo atraviesa
+                continue
+            touched = touched or (l <= top if side > 0 else h >= bottom)
+            if touched:
+                impulse = c > top if side > 0 else c < bottom
+                if self.mode == "toque" or impulse:
+                    self.events.append(side)        # respetado
                     continue
-                if l <= top:
-                    self.events.append(1)
-                    continue
-            else:
-                if c > top:
-                    self.events.append(1)
-                    continue
-                if h >= bottom:
-                    self.events.append(-1)
-                    continue
+                f[4] = True
             keep.append(f)
         self.fvgs = keep
         self.candles.append((o, h, l, c))
         if len(self.candles) >= 3:
             found = detect_fvg(*self.candles[-3:], self.min_gap)
             if found is not None:
-                self.fvgs.append((found[0], found[1], found[2], self.day))
+                self.fvgs.append([found[0], found[1], found[2], self.day, False])
 
     @property
     def bias(self) -> int:
@@ -115,6 +116,7 @@ class FirstFVG(Strategy):
         "flujo_timeframe_min": 15,       # flujo_fvg: velas en las que se miden los FVG respetados/no respetados
         "flujo_eventos": 1,              # flujo_fvg: eventos seguidos en la misma dirección para fijar sesgo
         "flujo_dias": 3,                 # flujo_fvg: días que sigue vivo un FVG sin resolver
+        "flujo_respeto": "impulso",      # flujo_fvg: impulso (toca y luego se aleja) | toque
         "timeframe_min": 1,              # velas de 1, 2, 3, 5... minutos para detectar el FVG
         "hora_inicio": "09:30",          # el patrón debe empezar a partir de esta hora
         "solo_primero": True,            # True: solo el primer FVG del día (válido o no)
@@ -139,7 +141,7 @@ class FirstFVG(Strategy):
         if "flujo_fvg" in self._filters():
             if self._flow is None:
                 self._flow = FvgOrderFlow(self.p["fvg_min_ticks"] * ctx.instrument.tick_size,
-                                          self.p["flujo_eventos"], self.p["flujo_dias"])
+                                          self.p["flujo_eventos"], self.p["flujo_dias"], self.p["flujo_respeto"])
             self._flow.new_day()
             self._flow_builder = CandleBuilder(self.p["flujo_timeframe_min"], ctx.session_open_min)
         self.fvg = None          # (lado, fondo, techo, stop_ref)

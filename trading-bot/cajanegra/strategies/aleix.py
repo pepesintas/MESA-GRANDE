@@ -1,17 +1,18 @@
 """Sistema de 3 pasos de Aleix Andreu (según la transcripción de su vídeo fijado).
 
-1. DIRECCIÓN (draw on liquidity) en velas de 15 min: ¿qué FVG se respetan y cuáles no? Si se
-   respetan los bajistas y no los alcistas, el precio va al siguiente mínimo estructural (y al revés).
-2. ZONA DE REACCIÓN: un FVG de 15 min a favor de esa dirección al que el precio vuelve en retroceso.
-3. CONFIRMACIÓN en 1 min: un IFVG. Dentro de la zona se forma un FVG en contra y el precio lo
-   invierte (cierra al otro lado): entrada hacia el objetivo.
+1. DIRECCIÓN (draw on liquidity) en velas de 15 min o 1 h: ¿qué FVG se respetan (el precio los
+   mitiga y da un impulso) y cuáles no (los atraviesa)? El objetivo es el siguiente punto
+   estructural: los mínimos (o máximos) de esa temporalidad.
+2. ZONA DE REACCIÓN: un FVG de esa temporalidad a favor de la dirección al que el precio vuelve.
+3. CONFIRMACIÓN en 1 min (él a veces baja a 30 s): un IFVG. Dentro de la zona se forma un FVG en
+   contra y el precio lo invierte: entrada "con el stop loss debajo y el take profit en el objetivo".
 
-Supuestos nuestros (la transcripción no los detalla, todos son parámetros):
-- Stop: más allá del extremo del retroceso desde que se tocó la zona (`stop=extremo`) o más allá
-  del IFVG (`stop=ifvg`).
-- Objetivo: fijo en R (1,5R como en su challenge) o el siguiente punto estructural (`objetivo=dol`).
+Supuestos nuestros (la transcripción no los concreta; todos son parámetros):
+- Stop "debajo": más allá del extremo del retroceso desde que se tocó la zona (`stop=extremo`) o
+  más allá del IFVG (`stop=ifvg`).
 - Entrada a mercado en la apertura de la vela siguiente a la inversión.
-- Datos solo de la sesión de Nueva York (sin los FVG de Asia/Londres).
+- Ratio mínimo de 1,5 (el de su challenge) para aceptar la operación (`exigir_dol`, `objetivo_r`).
+- Datos solo de la sesión de Nueva York (sin los FVG de Asia/Londres); sin velas de 30 s.
 """
 
 from __future__ import annotations
@@ -26,12 +27,13 @@ class AleixIFVG(Strategy):
     name = "aleix"
     description = "Aleix: dirección por FVG respetados (15m) → zona FVG (15m) → IFVG (1m)"
     defaults = {
-        "htf_min": 15,                 # temporalidad de los pasos 1 y 2
+        "htf_min": 15,                 # temporalidad de los pasos 1 y 2 (él usa 15 min o 1 h)
         "ltf_min": 1,                  # temporalidad del IFVG (paso 3)
         "fvg_min_ticks_htf": 4,
         "fvg_min_ticks_ltf": 2,
         "flujo_eventos": 1,            # eventos seguidos para fijar la dirección
         "flujo_dias": 3,               # días que sigue vivo un FVG sin resolver
+        "respeto": "impulso",          # impulso: lo mitiga y se aleja | toque: basta con tocarlo
         "zona_minutos": 60,            # cuánto dura una zona tras tocarla
         "direccion": "ambas",
         "hora_inicio": "09:30",
@@ -39,8 +41,8 @@ class AleixIFVG(Strategy):
         "hora_salida": "15:50",
         "stop": "extremo",             # extremo | ifvg
         "stop_margen_ticks": 2,
-        "objetivo": "r",               # r: objetivo fijo | dol: siguiente punto estructural
-        "objetivo_r": 1.5,
+        "objetivo": "dol",             # dol: el siguiente punto estructural (su vídeo) | r: fijo en R (su challenge)
+        "objetivo_r": 1.5,             # ratio del objetivo fijo, y ratio mínimo exigido hasta la DOL
         "exigir_dol": True,            # solo si el siguiente punto estructural está a ≥ objetivo_r·riesgo
         "max_operaciones": 1,
         "contratos": 1,
@@ -59,7 +61,8 @@ class AleixIFVG(Strategy):
     def on_day_start(self, ctx):
         tick = ctx.instrument.tick_size
         if self._flow is None:
-            self._flow = FvgOrderFlow(self.p["fvg_min_ticks_htf"] * tick, self.p["flujo_eventos"], self.p["flujo_dias"])
+            self._flow = FvgOrderFlow(self.p["fvg_min_ticks_htf"] * tick, self.p["flujo_eventos"],
+                                      self.p["flujo_dias"], self.p["respeto"])
         self._flow.new_day()
         self._day += 1
         keep = int(self.p["flujo_dias"])
