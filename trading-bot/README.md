@@ -73,6 +73,7 @@ python -m cajanegra comparar-firmas --esperanza 0,0.1,0.2 --riesgo 150,200,250,3
 ```
 
 Investigación de firmas (política de bots, reglas, costes, comparativa): [`docs/fondeo.md`](docs/fondeo.md).
+Probabilidades, win rate y plataformas de backtesting: [`docs/probabilidades_y_backtesting.md`](docs/probabilidades_y_backtesting.md).
 
 Cualquier CSV sirve si tiene fecha/hora y `open, high, low, close[, volume]`. Opciones:
 `--tz-datos America/New_York` si las horas vienen sin zona, `--etiqueta end` si el
