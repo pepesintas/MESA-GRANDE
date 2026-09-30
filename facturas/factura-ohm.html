@@ -23,7 +23,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 .hoja{
-  width:210mm;min-height:297mm;margin:14px auto;padding:13mm 11mm 9mm;
+  width:210mm;min-height:297mm;margin:14px auto;padding:11mm 11mm 9mm;
   background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.14);
   display:flex;flex-direction:column;
 }
@@ -38,7 +38,7 @@ body{
   font-size:7pt;color:var(--gris);letter-spacing:.18em;
   text-transform:uppercase;margin-top:1mm;
 }
-.regla{height:.9mm;background:var(--amarillo);margin-top:4mm}
+.regla{height:.9mm;background:var(--amarillo);margin-top:3mm}
 
 /* ---------- Rejilla de datos ---------- */
 .datos{
@@ -46,14 +46,14 @@ body{
   border:1px solid var(--linea);border-radius:1.5mm;overflow:hidden;
   margin-top:4mm;
 }
-.celda{padding:1.4mm 3mm;border-bottom:1px solid var(--linea2)}
+.celda{padding:1mm 3mm;border-bottom:1px solid var(--linea2)}
 .celda:nth-child(odd){border-right:1px solid var(--linea2)}
 .celda:nth-last-child(-n+2){border-bottom:none}
 .celda .et{
   font-size:6pt;color:var(--gris);letter-spacing:.13em;
-  text-transform:uppercase;display:block;margin-bottom:.4mm;
+  text-transform:uppercase;display:block;margin-bottom:.3mm;line-height:1.2;
 }
-.celda .va{font-size:8pt;font-weight:700}
+.celda .va{font-size:8pt;font-weight:700;line-height:1.2;display:block}
 
 /* ---------- Caja del total ---------- */
 .total-box{
@@ -84,10 +84,10 @@ table{width:100%;border-collapse:collapse;table-layout:fixed}
 thead th{
   font-size:6.2pt;font-weight:700;color:var(--gris2);letter-spacing:.11em;
   text-transform:uppercase;text-align:right;
-  background:#F4F4F4;padding:1.3mm 2mm;
+  background:#F4F4F4;padding:.9mm 2mm;
 }
 thead th:first-child{text-align:left}
-tbody td{padding:1.2mm 2mm;border-bottom:1px solid var(--linea2);text-align:right;font-size:9.5pt}
+tbody td{padding:1.05mm 2mm;border-bottom:1px solid var(--linea2);text-align:right;font-size:9.5pt}
 tbody td:first-child{text-align:left;font-weight:700}
 tfoot tr.tot td{
   border-top:1px solid var(--linea);text-align:right;
@@ -98,7 +98,7 @@ tfoot tr.tot td:first-child{text-align:left}
 /* ---------- Liquidación ---------- */
 .liq{width:100%;border-collapse:collapse;margin-top:1mm}
 .liq{table-layout:auto}
-.liq td{padding:1.15mm 2mm;border-bottom:1px solid var(--linea2);font-size:10pt;text-align:left}
+.liq td{padding:.85mm 2mm;border-bottom:1px solid var(--linea2);font-size:10pt;text-align:left}
 .liq td:first-child{font-weight:400}
 .liq td:last-child{font-weight:400}
 .liq td:last-child{text-align:right;white-space:nowrap}
@@ -111,20 +111,20 @@ tfoot tr.tot td:first-child{text-align:left}
 .liq tr.total-fin td:first-child{letter-spacing:.03em}
 
 /* ---------- Pie ---------- */
-.pie{margin-top:4mm}
+.pie{margin-top:3mm}
 .nota{
   background:var(--crema);border-left:1.2mm solid var(--amarillo);
-  padding:2mm 3.5mm;font-size:7.5pt;color:var(--gris2);border-radius:0 1mm 1mm 0;
+  padding:1.7mm 3.5mm;font-size:7.5pt;color:var(--gris2);border-radius:0 1mm 1mm 0;
 }
 .nota b{color:var(--tinta)}
 .sello{
-  display:inline-block;margin-top:3.5mm;padding:1.6mm 3.5mm;
+  display:inline-block;margin-top:2mm;padding:1.1mm 3.5mm;
   border:1px solid var(--amarillo);border-radius:1mm;
-  font-size:7.5pt;font-weight:700;color:#B08C00;letter-spacing:.2em;text-transform:uppercase;
+  font-size:7pt;font-weight:700;color:#B08C00;letter-spacing:.2em;text-transform:uppercase;
 }
 .legal{
-  margin-top:3.5mm;padding-top:2.5mm;border-top:1px solid var(--linea2);
-  font-size:6.6pt;color:var(--gris);line-height:1.6;
+  margin-top:2mm;padding-top:1.4mm;border-top:1px solid var(--linea2);
+  font-size:6.2pt;color:var(--gris);line-height:1.45;
 }
 
 /* ---------- Edición ---------- */
