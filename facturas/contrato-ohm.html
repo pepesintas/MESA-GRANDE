@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato de suministro eléctrico — OHM ENERGY</title>
+<style>
+:root{
+  --amarillo:#FFCB00;
+  --tinta:#1A1A1A;
+  --gris:#8C8C8C;
+  --gris2:#5E5E5E;
+  --linea:#DDDDDD;
+  --linea2:#EDEDED;
+  --crema:#FFFDF2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#e9e9ea}
+body{
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  color:var(--tinta);font-size:9pt;line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+}
+.hoja{
+  width:210mm;min-height:297mm;margin:14px auto;padding:11mm 11mm 9mm;
+  background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.14);
+}
+
+/* ---------- Cabecera ---------- */
+.cab{display:flex;justify-content:space-between;align-items:flex-start}
+.logo{width:31mm;flex:none}
+.logo svg{width:100%;height:auto;display:block}
+.cab-t{text-align:right;padding-top:2mm}
+.cab-t h1{font-size:12pt;font-weight:700;letter-spacing:-.01em}
+.cab-t .plan{font-size:7pt;color:var(--gris);letter-spacing:.18em;text-transform:uppercase;margin-top:1mm}
+.regla{height:.9mm;background:var(--amarillo);margin-top:3mm}
+
+/* ---------- Rejilla de datos ---------- */
+.datos{
+  display:grid;grid-template-columns:1fr 1fr;
+  border:1px solid var(--linea);border-radius:1.5mm;overflow:hidden;margin-top:4mm;
+}
+.celda{padding:1mm 3mm;border-bottom:1px solid var(--linea2)}
+.celda:nth-child(odd){border-right:1px solid var(--linea2)}
+.celda:nth-last-child(-n+2){border-bottom:none}
+.celda .et{
+  font-size:6pt;color:var(--gris);letter-spacing:.13em;text-transform:uppercase;
+  display:block;margin-bottom:.3mm;line-height:1.2;
+}
+.celda .va{font-size:8pt;font-weight:700;line-height:1.2;display:block}
+
+/* ---------- Titulares y tablas ---------- */
+h2{font-size:9pt;font-weight:700;margin:3.5mm 0 1mm}
+.sec{font-size:6.2pt;color:var(--gris);letter-spacing:.16em;text-transform:uppercase;margin:3mm 0 .8mm}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead th{
+  font-size:6.2pt;font-weight:700;color:var(--gris2);letter-spacing:.11em;
+  text-transform:uppercase;background:#F4F4F4;padding:.9mm 2mm;
+}
+.c-per{text-align:left}
+.c-pre{text-align:right}
+.c-uni{text-align:left}
+tbody td{padding:1.05mm 2mm;border-bottom:1px solid var(--linea2);font-size:9.5pt}
+tbody td.c-per{font-weight:700}
+
+
+/* ---------- Nota ---------- */
+.nota{
+  background:var(--crema);border-left:1.2mm solid var(--amarillo);
+  padding:1.7mm 3.5mm;font-size:7.5pt;color:var(--gris2);
+  border-radius:0 1mm 1mm 0;margin-top:3mm;
+}
+.nota b{color:var(--tinta)}
+
+/* ---------- Condiciones ---------- */
+.cond{margin:1mm 0 0;padding-left:2.6mm;font-size:7.2pt;line-height:1.45;color:var(--gris2)}
+.cond li{margin-bottom:.7mm;padding-left:0}
+.cond li::marker{color:var(--gris);font-size:7pt}
+.cond b{color:var(--tinta)}
+
+/* ---------- Firmas ---------- */
+.firmas{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:4.5mm}
+.firma{border-top:1px solid var(--tinta);padding-top:1.6mm;line-height:1.3}
+.firma .q{font-size:8pt;font-weight:700}
+.firma .n{font-size:8pt;margin-top:.15mm}
+.firma .f{font-size:8pt;color:var(--gris2);margin-top:.15mm}
+
+/* ---------- Pie ---------- */
+.sello{
+  display:inline-block;margin-top:4mm;padding:.6mm 3.5mm;
+  border:1px solid var(--amarillo);border-radius:1mm;
+  font-size:7pt;font-weight:700;color:#B08C00;letter-spacing:.2em;text-transform:uppercase;
+}
+.legal{
+  margin-top:2mm;padding-top:1.4mm;border-top:1px solid var(--linea2);
+  font-size:6.2pt;color:var(--gris);line-height:1.45;
+}
+
+/* ---------- Edición ---------- */
+[contenteditable]{outline:none;border-radius:1px}
+[contenteditable]:hover{background:rgba(255,203,0,.16)}
+[contenteditable]:focus{background:rgba(255,203,0,.34)}
+[contenteditable]:empty::before{content:attr(data-ph);color:#C8C8C8}
+.quitar{border:none;background:none;color:#C4C4C4;cursor:pointer;font-size:12px;line-height:1;padding-left:2mm}
+.quitar:hover{color:#D33}
+
+/* ---------- Barra ---------- */
+.barra{
+  position:sticky;top:0;z-index:9;background:#141414;color:#fff;
+  padding:9px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;
+}
+.barra .marca{font-weight:700;letter-spacing:.08em;margin-right:auto}
+.barra .marca b{color:var(--amarillo)}
+.barra button{font:inherit;padding:6px 12px;border-radius:5px;cursor:pointer;background:#2E2E2E;color:#fff;border:1px solid #454545}
+.barra button:hover{background:#3C3C3C}
+.barra button.pri{background:var(--amarillo);color:#141414;border-color:var(--amarillo);font-weight:700}
+.barra label{display:flex;align-items:center;gap:6px;color:#BDBDBD;cursor:pointer}
+
+@media print{
+  @page{size:A4;margin:0}
+  html{background:#fff}
+  .barra{display:none}
+  .hoja{width:auto;min-height:auto;margin:0;box-shadow:none}
+  [contenteditable]:hover,[contenteditable]:focus{background:none}
+  /* Los huecos vacíos se imprimen en blanco, no con su texto de ayuda */
+  [contenteditable]:empty::before{content:""}
+  .quitar{display:none}
+  tr,.cond li,.firmas{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <span class="marca">OHM <b>ENERGY</b> · plantilla de contrato</span>
+  <label><input type="checkbox" id="sw-sello" checked> Sello «modelo»</label>
+  <button data-add="pot">+ Periodo potencia</button>
+  <button data-add="ene">+ Periodo energía</button>
+  <button data-add="cond">+ Condición</button>
+  <button class="pri" onclick="window.print()">Imprimir / PDF</button>
+</div>
+
+<div class="hoja">
+
+  <header class="cab">
+    <!-- LOGO OHM ENERGY — vectorizado a partir del logotipo original.
+         Para usar el archivo de marca: <img src="logo-ohm.svg" alt="OHM ENERGY"> -->
+    <div class="logo">
+      <svg viewBox="0 0 748 335" role="img" aria-label="OHM ENERGY">
+        <circle cx="122" cy="121" r="86" fill="none" stroke="#FFCB00" stroke-width="28"/>
+        <g fill="#1A1A1A">
+          <rect x="296" y="26" width="25" height="190"/>
+          <rect x="440" y="26" width="25" height="190"/>
+          <rect x="296" y="109" width="169" height="22"/>
+        </g>
+        <path d="M543 24 L635.5 126.2 L728 24 L728 55.5 L635.5 157.7 L543 55.5 Z" fill="#FFCB00"/>
+        <g fill="#1A1A1A">
+          <path d="M546 88 L570 114.5 L570 215 L546 215 Z"/>
+          <path d="M727 84 L727 215 L703 215 L703 110.5 Z"/>
+        </g>
+        <text x="57" y="320" fill="#1A1A1A" textLength="634" lengthAdjust="spacing"
+              font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+              font-size="64" font-weight="300">ENERGY</text>
+      </svg>
+    </div>
+    <div class="cab-t">
+      <h1 contenteditable data-ph="Tipo de documento">Contrato de suministro eléctrico</h1>
+      <div class="plan" contenteditable data-ph="Tarifa">OHM BASIC</div>
+    </div>
+  </header>
+
+  <div class="regla"></div>
+
+  <section class="datos">
+    <div class="celda"><span class="et">Comercializadora</span>
+      <span class="va" contenteditable data-ph="Razón social · NIF">OHM ENERGY, S.L. · NIF B00000000</span></div>
+    <div class="celda"><span class="et">Nº de contrato</span>
+      <span class="va" contenteditable data-ph="OHM-0000-0000">OHM-2026-0002</span></div>
+
+    <div class="celda"><span class="et">Cliente</span>
+      <span class="va" contenteditable data-ph="Razón social">RESTAURANTE EGIPTO SL</span></div>
+    <div class="celda"><span class="et">NIF del cliente</span>
+      <span class="va" contenteditable data-ph="B00000000">B00000000</span></div>
+
+    <div class="celda"><span class="et">Dirección de suministro</span>
+      <span class="va" contenteditable data-ph="Dirección">PASEO LA RAMBLA 79</span></div>
+    <div class="celda"><span class="et">CUPS</span>
+      <span class="va" contenteditable data-ph="ES00000000000000XX">ES0031405951927028ZP</span></div>
+
+    <div class="celda"><span class="et">Tarifa de acceso</span>
+      <span class="va" contenteditable data-ph="2.0TD">2.0TD</span></div>
+    <div class="celda"><span class="et">Potencia contratada</span>
+      <span class="va" contenteditable data-ph="0,000 kW punta · 0,000 kW valle">3,464 kW punta · 3,464 kW valle</span></div>
+  </section>
+
+  <h2 contenteditable data-ph="Titular de la sección de precios">Precios aplicables durante los 12 primeros meses</h2>
+
+  <div class="sec">Término de potencia</div>
+  <table id="t-pot">
+    <thead>
+      <tr>
+        <th class="c-per" style="width:50%">Periodo</th>
+        <th class="c-pre" style="width:11%">Precio</th>
+        <th class="c-uni" style="width:39%">Unidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="c-per" contenteditable data-ph="P1">P1</td>
+        <td class="c-pre" contenteditable data-ph="0,000000">0,075903</td>
+        <td class="c-uni" contenteditable data-ph="€/kW y día">€/kW y día</td>
+      </tr>
+      <tr>
+        <td class="c-per" contenteditable data-ph="P1">P3</td>
+        <td class="c-pre" contenteditable data-ph="0,000000">0,001987</td>
+        <td class="c-uni" contenteditable data-ph="€/kW y día">€/kW y día</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sec">Término de energía · todo incluido</div>
+  <table id="t-ene">
+    <thead>
+      <tr>
+        <th class="c-per" style="width:60%">Periodo</th>
+        <th class="c-pre" style="width:11%">Precio</th>
+        <th class="c-uni" style="width:29%">Unidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="c-per" contenteditable data-ph="P1">P1</td>
+        <td class="c-pre" contenteditable data-ph="0,000000">0,263406</td>
+        <td class="c-uni" contenteditable data-ph="€/kWh">€/kWh</td>
+      </tr>
+      <tr>
+        <td class="c-per" contenteditable data-ph="P1">P2</td>
+        <td class="c-pre" contenteditable data-ph="0,000000">0,182277</td>
+        <td class="c-uni" contenteditable data-ph="€/kWh">€/kWh</td>
+      </tr>
+      <tr>
+        <td class="c-per" contenteditable data-ph="P1">P3</td>
+        <td class="c-pre" contenteditable data-ph="0,000000">0,158022</td>
+        <td class="c-uni" contenteditable data-ph="€/kWh">€/kWh</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <b>Lo que ya sabe el cliente:</b> <span contenteditable data-ph="Aclaración para el cliente">el término de potencia es el coste regulado, sin margen de la comercializadora. Los impuestos y el alquiler del equipo de medida se repercuten tal y como los fija la normativa.</span>
+  </div>
+
+  <h2 contenteditable data-ph="Titular de las condiciones">Condiciones</h2>
+  <ol class="cond" id="cond">
+    <li><b contenteditable data-ph="Epígrafe">Duración y permanencia.</b> <span contenteditable data-ph="Texto">Doce meses desde la fecha de activación, con permanencia de doce meses. Transcurrido el plazo se renueva por periodos iguales salvo aviso de cualquiera de las partes con quince días de antelación.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Precio.</b> <span contenteditable data-ph="Texto">Los precios de la tabla anterior se mantienen fijos durante los doce primeros meses. Peajes, cargos, impuestos y alquiler del equipo de medida se repercuten al coste que fije la normativa en cada momento.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Alta y cambio.</b> <span contenteditable data-ph="Texto">Sin coste de alta ni de cambio de comercializadora. El cambio lo tramita OHM ante la distribuidora y no interrumpe el suministro.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Facturación y pago.</b> <span contenteditable data-ph="Texto">Facturación mensual según lecturas de la distribuidora, por domiciliación bancaria en la cuenta indicada por el cliente.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Potencia contratada.</b> <span contenteditable data-ph="Texto">El cliente puede solicitar su modificación; el coste que aplique la distribuidora se repercute sin recargo.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Desistimiento.</b> <span contenteditable data-ph="Texto">Catorce días naturales desde la firma, sin penalización, comunicándolo por cualquiera de los medios de contacto de esta hoja.</span></li>
+    <li><b contenteditable data-ph="Epígrafe">Protección de datos.</b> <span contenteditable data-ph="Texto">Los datos se tratan para gestionar el suministro y la facturación. Derechos de acceso, rectificación y supresión en clientes@ohmenergy.es.</span></li>
+  </ol>
+
+  <section class="firmas">
+    <div class="firma">
+      <div class="q" contenteditable data-ph="Parte">Por la comercializadora</div>
+      <div class="n" contenteditable data-ph="Razón social">OHM ENERGY, S.L.</div>
+      <div class="f">Fecha: <span contenteditable data-ph="dd/mm/aaaa"></span></div>
+    </div>
+    <div class="firma">
+      <div class="q" contenteditable data-ph="Parte">El cliente</div>
+      <div class="n" contenteditable data-ph="Razón social">RESTAURANTE EGIPTO SL</div>
+      <div class="f">Fecha: <span contenteditable data-ph="dd/mm/aaaa"></span></div>
+    </div>
+  </section>
+
+  <div class="sello" id="sello">Modelo · documento sin validez</div>
+
+  <p class="legal" contenteditable data-ph="Datos fiscales y de contacto">
+    OHM ENERGY, S.L. · NIF B00000000 · Calle Ejemplo 1 · 08001 Barcelona · 900 000 000 ·
+    clientes@ohmenergy.es · ohmenergy.es
+  </p>
+
+</div>
+
+<script>
+const quitarBtn = ' <button class="quitar" title="Eliminar">&times;</button>';
+
+document.querySelectorAll('.barra [data-add]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const k = btn.dataset.add;
+    const lista = k === 'cond' ? document.getElementById('cond')
+                               : document.querySelector(k === 'pot' ? '#t-pot tbody' : '#t-ene tbody');
+    const nodo = (k === 'cond' ? lista.children[0] : lista.rows[0]).cloneNode(true);
+    // La unidad se repite en cada fila, así que se conserva; el resto se vacía.
+    nodo.querySelectorAll('[contenteditable]').forEach(c => {
+      if (!c.classList.contains('c-uni')) c.textContent = '';
+    });
+    (k === 'cond' ? nodo : nodo.querySelector('.c-uni')).insertAdjacentHTML('beforeend', quitarBtn);
+    lista.appendChild(nodo);
+    nodo.querySelector('[contenteditable]').focus();
+  });
+});
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('.quitar');
+  if (!b) return;
+  b.closest('li, tr').remove();
+});
+
+document.getElementById('sw-sello').addEventListener('change', e => {
+  document.getElementById('sello').style.display = e.target.checked ? '' : 'none';
+});
+
+// Pegar siempre como texto plano para no romper el formato.
+document.addEventListener('paste', e => {
+  if (!e.target.closest('[contenteditable]')) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+});
+</script>
+</body>
+</html>

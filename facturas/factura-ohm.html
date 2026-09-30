@@ -161,6 +161,8 @@ tfoot tr.tot td:first-child{text-align:left}
   .barra{display:none}
   .hoja{width:auto;min-height:auto;margin:0;box-shadow:none}
   [contenteditable]:hover,[contenteditable]:focus{background:none}
+  /* Los huecos vacíos se imprimen en blanco, no con su texto de ayuda */
+  [contenteditable]:empty::before{content:""}
   .quitar{display:none}
   tr{page-break-inside:avoid}
 }
