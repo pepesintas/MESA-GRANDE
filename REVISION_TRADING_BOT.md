@@ -21,19 +21,22 @@ En la carpeta `MESA-GRANDE` no hay nada del bot (es una web con `index.html` y u
 ## Veredicto en tres líneas
 
 1. **La ingeniería es buena:** no hay lookahead (lo comprobé con una prueba más dura que la del repo), la contabilidad de P&L cuadra al céntimo, el método (walk-forward, registro de errores) es de nivel alto.
-2. **La conclusión económica está mucho menos firme de lo que dice `ESTADO.md`:** con esta muestra, +250 $/intento es estadísticamente indistinguible de 0, y el plan de "20 cuentas" **choca con una regla de Topstep** (máx. 5 cuentas Express Funded activas).
+2. **La conclusión económica está mucho menos firme de lo que dice `ESTADO.md`:** con esta muestra, +250 $/intento es estadísticamente indistinguible de 0, y los **2.780 $/mes de las 20 escalonadas no cuadran** con 2 intentos al mes × +250 $ (≈500 $/mes).
 3. **Antes de escribir el `runner` en vivo** hay que arreglar 3-4 cosas pequeñas (abajo). Ninguna cuesta más de una tarde.
 
 ---
 
 ## A. Problemas que afectan a la decisión de comprar cuentas
 
-### A1. El plan de "20 cuentas escalonadas" no es viable tal como está escrito — **crítico**
-- Topstep permite **hasta 5 Express Funded Accounts activas a la vez** ([fuente](https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit) y resultados de búsqueda de su help center; verifícalo tú en la web, no pude abrirla). Con 5, los ~2.780 $/mes se dividen por 4.
-- La cifra **2.780 $/mes (rango 646-4.166, 1 % de perder)** aparece **solo en `ESTADO.md`**. No hay script, ni test, ni sección en `docs/` que la genere. No es reproducible ni auditable.
-- Las 20 cuentas operarían **la misma señal**: no diversifican, aprueban y suspenden a la vez (lo dice vuestro propio README). Escalar multiplica media **y** riesgo. Si la ventaja real fuera 0, 20 cuentas = 20× las cuotas (49 $/mes + 149 $ de activación cada una) sin nada a cambio.
-- Riesgo operativo: Topstep exige que toda la actividad salga de **tu dispositivo personal** (VPS/remotos prohibidos). Un corte de internet o PC durante una posición afectaría a todas a la vez.
-- Hace falta escribir `scripts/escala.py` que genere esa cifra desde los días reales, con el tope de cuentas y la correlación completa (misma serie de P&L, arranques desfasados).
+### A1. Las "20 cuentas escalonadas" (2 Combines al mes durante 10 meses): la cifra de 2.780 $/mes no cuadra — **alto**
+*Corregido tras la aclaración del propietario: son 2 al mes durante 10 meses, no 20 a la vez.*
+- **El tope de Topstep ya no es el problema principal.** Topstep permite hasta 5 Express Funded activas a la vez (resultado de búsqueda; verifícalo en su web, no pude abrirla). Con 2 Combines al mes y ~35 % de aprobar salen ~7 fondeadas en total, y varias se pierden por el camino, así que rara vez habrá 5 vivas a la vez. Queda por comprobar si hay tope de **Combines** simultáneas (con ~2-6 abiertas a la vez, quizá roce el límite).
+- **La aritmética no cuadra.** Con "+250 $ de valor esperado por intento" (que ya descuenta cuotas) y 2 intentos al mes, el régimen estable es del orden de **500 $/mes netos** (unos 800 $/mes brutos si sumas las cuotas). Los **2.780 $/mes** (`ESTADO.md` dice que cada cuenta aporta 130-140 $/mes) solo salen si hay **~20 cuentas fondeadas cobrando a la vez**, cosa que 2/mes × 35 % de aprobar no produce. O la cifra es otra cosa (¿total en vez de mensual? ¿mes 10 con todas vivas?) o hay un error. Sin el script no puedo saber cuál.
+- La cifra (rango 646-4.166, 1 % de perder) aparece **solo en `ESTADO.md`**: ni script, ni test, ni sección en `docs/`. No es reproducible.
+- **Sobre la correlación (corrijo mi primera versión):** escalonar sí descorrelaciona *cuándo* aprueba o suspende cada cuenta, porque cada una vive un tramo distinto de la serie. Lo que no descorrelaciona es la **exposición al mismo mercado y a la misma señal** cuando coinciden en el tiempo, y todas dependen de la misma ventaja. Escalonar reparte el riesgo en el tiempo; no lo elimina.
+- **Techo de pérdida si la ventaja fuera 0** (estimación con las cuotas del TOML: 49 $/mes y 149 $ de activación): del orden de 100-190 $ por intento, o sea **~2.000-4.000 $ en las 20**, más 29 $/mes de API. Es acotado, y es la cifra que habría que comparar con el beneficio esperado.
+- Riesgo operativo: Topstep exige que toda la actividad salga de **tu dispositivo personal** (VPS/remotos prohibidos). Un corte de internet o de PC con posición abierta afecta a todas las cuentas vivas.
+- Hace falta `scripts/escala.py` que reproduzca la cifra desde los días reales: 2 arranques al mes durante 10 meses, cuentas vivas simultáneas con sus topes, y distribución del neto acumulado (no solo la media).
 
 ### A2. Los intervalos de confianza son enormes y las cifras se presentan sin ellos — **crítico**
 - `rolling_starts` usa arranques en **todos** los días: ventanas solapadas. En 2022-10→2026-09 hay ~1.000 sesiones; con evaluación de 60 sesiones eso son **~16 ventanas independientes**.
@@ -133,7 +136,7 @@ La documentación dice "límites: el precio tiene que **cruzar**", pero objetivo
 2. **(½ día)** Arreglar B2 (cancelar stops al cerrar) + tests de `live/`; sustituir `utcnow`.
 3. **(½ día)** Pre-calentamiento del histórico de σ (B3) y rellenado de minutos ausentes (B4); repetir los números clave y ver cuánto cambian.
 4. **(1 día)** Intervalos de confianza y análisis "sin las N mejores operaciones" en `evaluation_report`; separar y **congelar** un tramo final como holdout.
-5. **(1 día)** `scripts/escala.py`: reproducir los "2.780 $/mes" con máx. 5 cuentas, correlación completa y arranques desfasados. Si no sale positivo con IC, no comprar.
+5. **(1 día)** `scripts/escala.py`: reproducir los "2.780 $/mes" con 2 arranques al mes durante 10 meses, topes de cuentas vivas y correlación completa. Si no sale positivo con IC, no comprar.
 6. **(1 día)** Slippage dependiente de volatilidad/hora y detección de rolado en el loader; volver a correr la validación con QC **con la configuración final** (800 $ + parcial).
 7. **Después:** `runner.py` con kill switch propio (pérdida diaria, MLL restante, máx. operaciones), reconciliación de posición en cada barra, cierre a las 15:59 garantizado, y **paper trading** midiendo slippage antes de cualquier cuenta de pago.
 8. Corregir las reglas (supuesto) del TOML de Topstep desde la web oficial, incluida la DLL opcional y el plan de escalado.
