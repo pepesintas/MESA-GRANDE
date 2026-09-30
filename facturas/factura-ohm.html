@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factura — OHM ENERGY</title>
+<style>
+:root{
+  --ohm-yellow:#FFC907;
+  --ink:#1a1a1a;
+  --ink2:#555;
+  --ink3:#8a8a8a;
+  --line:#e2e2e2;
+  --line2:#c9c9c9;
+  --bg:#f4f4f5;
+  --paper:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:11pt;line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Hoja A4 ---------- */
+.hoja{
+  width:210mm;min-height:297mm;
+  margin:16px auto;padding:16mm 15mm 14mm;
+  background:var(--paper);
+  box-shadow:0 2px 18px rgba(0,0,0,.13);
+  display:flex;flex-direction:column;
+}
+
+/* ---------- Cabecera ---------- */
+.cab{display:flex;justify-content:space-between;align-items:flex-start;gap:20mm}
+.logo{width:52mm;flex:none}
+.logo svg{width:100%;height:auto;display:block}
+.cab-doc{text-align:right;flex:none}
+.cab-doc h1{
+  font-size:23pt;font-weight:300;letter-spacing:.22em;
+  text-transform:uppercase;line-height:1;margin-bottom:5mm;
+}
+.meta{display:grid;grid-template-columns:auto auto;gap:1.5mm 6mm;font-size:9pt}
+.meta dt{color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;font-size:7.5pt;text-align:right;align-self:center}
+.meta dd{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+.regla{height:2.2mm;background:var(--ohm-yellow);margin:7mm 0 0}
+
+/* ---------- Partes ---------- */
+.partes{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:8mm}
+.parte h2{
+  font-size:7.5pt;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--ink3);font-weight:600;
+  padding-bottom:1.5mm;margin-bottom:3mm;border-bottom:1px solid var(--line);
+}
+.parte .nombre{font-weight:700;font-size:11.5pt;margin-bottom:1mm}
+.parte p{font-size:9.5pt;color:var(--ink2);line-height:1.5}
+
+/* ---------- Conceptos ---------- */
+table{width:100%;border-collapse:collapse;margin-top:9mm}
+thead th{
+  font-size:7.5pt;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink3);font-weight:600;text-align:left;
+  padding:0 2mm 2mm 0;border-bottom:1.2px solid var(--ink);
+}
+tbody td{
+  padding:2.8mm 2mm 2.8mm 0;border-bottom:1px solid var(--line);
+  font-size:10pt;vertical-align:top;
+}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.c-desc{width:auto}
+.c-cant,.c-precio,.c-iva{width:20mm}
+.c-imp{width:26mm}
+tbody td.c-desc{font-weight:500}
+.sub{display:block;font-size:8.5pt;color:var(--ink3);font-weight:400;margin-top:.6mm}
+tbody td.c-imp{font-weight:600}
+
+/* ---------- Totales ---------- */
+.pie-doc{margin-top:auto;padding-top:9mm}
+.cierre{display:grid;grid-template-columns:1fr 78mm;gap:10mm;align-items:start}
+.totales{width:100%;border-collapse:collapse}
+.totales td{padding:1.8mm 0;font-size:10pt}
+.totales td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.totales tr.sep td{border-top:1px solid var(--line)}
+.totales tr.total td{
+  border-top:2px solid var(--ink);padding-top:3mm;
+  font-size:13pt;font-weight:700;
+}
+.totales tr.total td:first-child{letter-spacing:.06em;text-transform:uppercase;font-size:9pt}
+.totales .et{color:var(--ink2);font-weight:400}
+
+.pago h2,.notas h2{
+  font-size:7.5pt;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--ink3);font-weight:600;margin-bottom:2.5mm;
+}
+.pago p,.notas p{font-size:9pt;color:var(--ink2);line-height:1.55}
+.pago .iban{font-weight:600;color:var(--ink);letter-spacing:.04em}
+.notas{margin-top:6mm}
+
+.legal{
+  margin-top:8mm;padding-top:3mm;border-top:1px solid var(--line);
+  font-size:7.5pt;color:var(--ink3);line-height:1.5;text-align:justify;
+}
+
+/* ---------- Campos editables ---------- */
+[contenteditable]{outline:none;border-radius:2px;transition:background .12s}
+[contenteditable]:hover{background:#fafaf0;box-shadow:0 0 0 2px #fafaf0}
+[contenteditable]:focus{background:#fff9d6;box-shadow:0 0 0 2px #fff9d6}
+[contenteditable]:empty::before{content:attr(data-ph);color:#c4c4c4}
+
+/* ---------- Barra de control (no imprime) ---------- */
+.barra{
+  position:sticky;top:0;z-index:10;
+  background:var(--ink);color:#fff;
+  padding:9px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  font-size:12px;
+}
+.barra .marca{font-weight:700;letter-spacing:.1em;margin-right:auto}
+.barra .marca b{color:var(--ohm-yellow)}
+.barra button{
+  font:inherit;padding:6px 13px;border-radius:5px;cursor:pointer;
+  background:#333;color:#fff;border:1px solid #4a4a4a;
+}
+.barra button:hover{background:#444}
+.barra button.pri{background:var(--ohm-yellow);color:#1a1a1a;border-color:var(--ohm-yellow);font-weight:600}
+.barra label{display:flex;align-items:center;gap:6px;color:#bdbdbd;cursor:pointer}
+.quitar{
+  border:none;background:none;color:#c9c9c9;cursor:pointer;
+  font-size:14px;line-height:1;padding:0 0 0 2mm;
+}
+.quitar:hover{color:#d33}
+
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff}
+  .barra{display:none}
+  .hoja{width:auto;min-height:auto;margin:0;padding:14mm 15mm;box-shadow:none}
+  [contenteditable]:hover,[contenteditable]:focus{background:none;box-shadow:none}
+  .quitar{display:none}
+  tbody tr{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <span class="marca">OHM <b>ENERGY</b> · plantilla de factura</span>
+  <label><input type="checkbox" id="sw-irpf"> Retención IRPF</label>
+  <button id="add">+ Línea</button>
+  <button class="pri" onclick="window.print()">Imprimir / PDF</button>
+</div>
+
+<div class="hoja">
+
+  <header class="cab">
+    <!-- LOGO — bloque único, sustituible por <img src="logo-ohm.png" alt="OHM ENERGY"> -->
+    <div class="logo">
+      <svg viewBox="0 0 1000 452" role="img" aria-label="OHM ENERGY">
+        <circle cx="172" cy="160" r="118" fill="none" stroke="#FFC907" stroke-width="46"/>
+        <path d="M392 32h48v104h150V32h48v256h-48V184H440v104h-48z" fill="#1a1a1a"/>
+        <path d="M733 32l128 196L989 32" fill="none" stroke="#FFC907" stroke-width="46"/>
+        <rect x="738" y="122" width="46" height="166" fill="#1a1a1a"/>
+        <rect x="938" y="122" width="46" height="166" fill="#1a1a1a"/>
+        <text x="500" y="420" text-anchor="middle" fill="#1a1a1a"
+              font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+              font-size="62" font-weight="300" letter-spacing="30">ENERGY</text>
+      </svg>
+    </div>
+
+    <div class="cab-doc">
+      <h1>Factura</h1>
+      <dl class="meta">
+        <dt>Nº factura</dt><dd contenteditable data-ph="F-2026-0001">F-2026-0001</dd>
+        <dt>Fecha emisión</dt><dd contenteditable data-ph="dd/mm/aaaa">30/09/2026</dd>
+        <dt>Vencimiento</dt><dd contenteditable data-ph="dd/mm/aaaa">30/10/2026</dd>
+        <dt>Periodo</dt><dd contenteditable data-ph="01/09 – 30/09/2026">01/09 – 30/09/2026</dd>
+      </dl>
+    </div>
+  </header>
+
+  <div class="regla"></div>
+
+  <section class="partes">
+    <div class="parte">
+      <h2>Emisor</h2>
+      <p class="nombre" contenteditable data-ph="Razón social">OHM ENERGY, S.L.</p>
+      <p>
+        <span contenteditable data-ph="NIF">NIF B-00000000</span><br>
+        <span contenteditable data-ph="Dirección">Calle ejemplo 1, 1º</span><br>
+        <span contenteditable data-ph="CP y ciudad">08001 Barcelona</span><br>
+        <span contenteditable data-ph="Email / teléfono">facturacion@ohmenergy.es · +34 900 000 000</span>
+      </p>
+    </div>
+    <div class="parte">
+      <h2>Cliente</h2>
+      <p class="nombre" contenteditable data-ph="Nombre o razón social"></p>
+      <p>
+        <span contenteditable data-ph="NIF / CIF"></span><br>
+        <span contenteditable data-ph="Dirección"></span><br>
+        <span contenteditable data-ph="CP y ciudad"></span><br>
+        <span contenteditable data-ph="CUPS / nº de contrato"></span>
+      </p>
+    </div>
+  </section>
+
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th class="c-desc">Concepto</th>
+        <th class="c-cant num">Cantidad</th>
+        <th class="c-precio num">Precio ud.</th>
+        <th class="c-iva num">IVA</th>
+        <th class="c-imp num">Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="c-desc"><span contenteditable data-ph="Concepto">Energía consumida</span><span class="sub" contenteditable data-ph="Detalle (opcional)">Término variable · kWh</span></td>
+        <td class="c-cant num" contenteditable data-ph="0">0</td>
+        <td class="c-precio num" contenteditable data-ph="0,00">0,00</td>
+        <td class="c-iva num" contenteditable data-ph="21">21</td>
+        <td class="c-imp num">0,00 €</td>
+      </tr>
+      <tr>
+        <td class="c-desc"><span contenteditable data-ph="Concepto">Potencia contratada</span><span class="sub" contenteditable data-ph="Detalle (opcional)">Término fijo · kW/día</span></td>
+        <td class="c-cant num" contenteditable data-ph="0">0</td>
+        <td class="c-precio num" contenteditable data-ph="0,00">0,00</td>
+        <td class="c-iva num" contenteditable data-ph="21">21</td>
+        <td class="c-imp num">0,00 €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pie-doc">
+    <div class="cierre">
+      <div>
+        <div class="pago">
+          <h2>Forma de pago</h2>
+          <p>
+            <span contenteditable data-ph="Transferencia / domiciliación">Transferencia bancaria</span><br>
+            <span class="iban" contenteditable data-ph="ES00 0000 0000 0000 0000 0000">ES00 0000 0000 0000 0000 0000</span><br>
+            <span contenteditable data-ph="Concepto del pago">Indicar el nº de factura como concepto</span>
+          </p>
+        </div>
+        <div class="notas">
+          <h2>Observaciones</h2>
+          <p contenteditable data-ph="Notas para el cliente (opcional)"></p>
+        </div>
+      </div>
+
+      <table class="totales">
+        <tbody>
+          <tr><td class="et">Base imponible</td><td id="t-base">0,00 €</td></tr>
+          <tr><td class="et">IVA</td><td id="t-iva">0,00 €</td></tr>
+          <tr id="fila-irpf" hidden><td class="et">Retención IRPF (<span contenteditable id="irpf-pct">15</span>%)</td><td id="t-irpf">0,00 €</td></tr>
+          <tr class="total"><td>Total a pagar</td><td id="t-total">0,00 €</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="legal" contenteditable data-ph="Texto legal">
+      Factura emitida conforme al Real Decreto 1619/2012, por el que se aprueba el Reglamento que regula las
+      obligaciones de facturación. Los datos personales facilitados se tratan con la finalidad de gestionar la
+      relación contractual y las obligaciones fiscales derivadas, conforme al Reglamento (UE) 2016/679 (RGPD).
+      Puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad en la
+      dirección de correo indicada en el encabezado.
+    </p>
+  </div>
+
+</div>
+
+<script>
+const EUR = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'});
+
+// Acepta "1.234,56" (es-ES), "1234.56" (en) y "1.250" (miles sin decimales)
+function num(txt){
+  const s = (txt || '').replace(/[^\d,.\-]/g, '');
+  if (!s) return 0;
+  let norm;
+  if (s.includes(',')) {
+    // La coma manda: es el separador decimal, los puntos son miles.
+    norm = s.replace(/\./g, '').replace(',', '.');
+  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) {
+    // Sólo puntos y todos agrupan de tres en tres: son separadores de miles.
+    norm = s.replace(/\./g, '');
+  } else {
+    norm = s;
+  }
+  const n = parseFloat(norm);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function recalcular(){
+  let base = 0, iva = 0;
+
+  document.querySelectorAll('#tabla tbody tr').forEach(tr => {
+    const cant   = num(tr.querySelector('.c-cant').textContent);
+    const precio = num(tr.querySelector('.c-precio').textContent);
+    const tipo   = num(tr.querySelector('.c-iva').textContent);
+    const importe = cant * precio;
+    base += importe;
+    iva  += importe * tipo / 100;
+    tr.querySelector('.c-imp').textContent = EUR.format(importe);
+  });
+
+  const filaIrpf = document.getElementById('fila-irpf');
+  const irpf = filaIrpf.hidden ? 0 : base * num(document.getElementById('irpf-pct').textContent) / 100;
+
+  document.getElementById('t-base').textContent  = EUR.format(base);
+  document.getElementById('t-iva').textContent   = EUR.format(iva);
+  document.getElementById('t-irpf').textContent  = '−' + EUR.format(irpf);
+  document.getElementById('t-total').textContent = EUR.format(base + iva - irpf);
+}
+
+function nuevaFila(){
+  const tr = document.querySelector('#tabla tbody tr').cloneNode(true);
+  tr.querySelectorAll('[contenteditable]').forEach(c => {
+    c.textContent = c.classList.contains('c-iva') ? '21' : '';
+  });
+  tr.querySelector('.c-imp').textContent = EUR.format(0);
+  tr.querySelector('.c-imp').insertAdjacentHTML('beforeend',
+    ' <button class="quitar" title="Eliminar línea">&times;</button>');
+  document.querySelector('#tabla tbody').appendChild(tr);
+  tr.querySelector('[contenteditable]').focus();
+}
+
+document.getElementById('add').addEventListener('click', nuevaFila);
+
+document.getElementById('sw-irpf').addEventListener('change', e => {
+  document.getElementById('fila-irpf').hidden = !e.target.checked;
+  recalcular();
+});
+
+document.addEventListener('input', recalcular);
+
+// Pegado siempre como texto plano, para no romper el formato
+document.addEventListener('paste', e => {
+  if (!e.target.closest('[contenteditable]')) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+});
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.quitar');
+  if (!btn) return;
+  btn.closest('tr').remove();
+  recalcular();
+});
+
+recalcular();
+</script>
+</body>
+</html>
