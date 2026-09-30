@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 748 335" width="748" height="335"
+     role="img" aria-label="OHM ENERGY">
+  <title>OHM ENERGY</title>
+  <circle cx="122" cy="121" r="86" fill="none" stroke="#FFCB00" stroke-width="28"/>
+  <g fill="#1A1A1A">
+    <rect x="296" y="26" width="25" height="190"/>
+    <rect x="440" y="26" width="25" height="190"/>
+    <rect x="296" y="109" width="169" height="22"/>
+  </g>
+  <path d="M543 24 L635.5 126.2 L728 24 L728 55.5 L635.5 157.7 L543 55.5 Z" fill="#FFCB00"/>
+  <g fill="#1A1A1A">
+    <path d="M546 88 L570 114.5 L570 215 L546 215 Z"/>
+    <path d="M727 84 L727 215 L703 215 L703 110.5 Z"/>
+  </g>
+  <text x="57" y="320" fill="#1A1A1A" textLength="634" lengthAdjust="spacing"
+        font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+        font-size="64" font-weight="300">ENERGY</text>
+</svg>
