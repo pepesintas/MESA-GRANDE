@@ -353,7 +353,9 @@ tfoot tr.tot td:first-child{text-align:left}
 </div>
 
 <script>
-const EUR = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'});
+// useGrouping:true fuerza el punto de millar también en los números de cuatro
+// dígitos, que el locale español deja sin separar por omisión (2515 vs 2.515).
+const EUR = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR', useGrouping:true});
 
 // Lee números en formato es-ES ("1.234,56", "3,464") y también "1234.56".
 function num(txt){

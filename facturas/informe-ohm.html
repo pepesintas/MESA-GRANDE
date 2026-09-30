@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe ejecutivo — OHM ENERGY</title>
+<style>
+:root{
+  --amarillo:#FFCB00;
+  --tinta:#1A1A1A;
+  --gris:#8C8C8C;
+  --gris2:#5E5E5E;
+  --linea:#DDDDDD;
+  --linea2:#EDEDED;
+  --crema:#FFFDF2;
+  --verde:#1B7A43;
+  --verde-bg:#F1F9F4;
+  --negro:#000;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#e9e9ea}
+body{
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  color:var(--tinta);font-size:9pt;line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+}
+.hoja{
+  width:210mm;min-height:297mm;margin:14px auto;padding:11mm 11mm 9mm;
+  background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.14);
+  display:flex;flex-direction:column;
+}
+
+/* ---------- Cabecera ---------- */
+.cab{display:flex;justify-content:space-between;align-items:flex-start}
+.logo{width:31mm;flex:none}
+.logo svg{width:100%;height:auto;display:block}
+.cab-t{text-align:right;padding-top:2mm}
+.cab-t h1{font-size:12pt;font-weight:700;letter-spacing:-.01em}
+.cab-t .plan{font-size:7pt;color:var(--gris);letter-spacing:.18em;text-transform:uppercase;margin-top:1mm}
+.regla{height:.9mm;background:var(--amarillo);margin-top:3mm}
+
+/* ---------- Rejilla de datos ---------- */
+.datos{
+  display:grid;grid-template-columns:1fr 1fr;
+  border:1px solid var(--linea);border-radius:1.5mm;overflow:hidden;margin-top:4mm;
+}
+.celda{padding:1mm 3mm;border-bottom:1px solid var(--linea2)}
+.celda:nth-child(odd){border-right:1px solid var(--linea2)}
+.celda:nth-last-child(-n+2){border-bottom:none}
+.celda .et{font-size:6pt;color:var(--gris);letter-spacing:.13em;text-transform:uppercase;display:block;margin-bottom:.3mm;line-height:1.2}
+.celda .va{font-size:8pt;font-weight:700;line-height:1.2;display:block}
+
+/* ---------- Secciones ---------- */
+.sec{
+  font-size:6.8pt;font-weight:700;color:var(--tinta);letter-spacing:.16em;text-transform:uppercase;
+  background:#F4F4F4;border-left:1.2mm solid var(--amarillo);
+  padding:1.5mm 3mm;margin:5mm 0 2.5mm;
+}
+p.txt{font-size:8.5pt;color:var(--gris2);line-height:1.55;margin-bottom:2mm}
+p.txt b{color:var(--tinta)}
+
+/* ---------- Cifras destacadas ---------- */
+.kpis{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:4mm;margin:4mm 0 1mm}
+.kpi{border:1px solid var(--linea);border-radius:1.5mm;padding:3mm 4mm;text-align:center}
+.kpi .et{font-size:6.5pt;color:var(--gris);letter-spacing:.18em;text-transform:uppercase;display:block}
+.kpi .n{font-size:19pt;font-weight:700;line-height:1.1;margin:1.2mm 0 .6mm;letter-spacing:-.02em}
+.kpi .u{font-size:7pt;color:var(--gris)}
+.kpi.hero{background:var(--negro);border-color:var(--negro);position:relative;overflow:hidden}
+.kpi.hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1.4mm;background:var(--amarillo)}
+.kpi.hero .et{color:var(--amarillo)}
+.kpi.hero .n{color:var(--amarillo);font-size:22pt}
+.kpi.hero .u{color:#C9C9C9}
+.kpi.verde{background:var(--verde-bg);border-color:#CFE6D8}
+.kpi.verde .n{color:var(--verde)}
+
+/* ---------- Tablas ---------- */
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead th{
+  font-size:5.8pt;font-weight:700;color:#fff;letter-spacing:.08em;text-transform:uppercase;
+  background:#2E2E2E;padding:1.6mm 1.5mm;text-align:right;vertical-align:bottom;
+}
+thead th:first-child{text-align:left;border-radius:1mm 0 0 0}
+thead th:last-child{border-radius:0 1mm 0 0}
+tbody td{padding:1.4mm 1.5mm;border-bottom:1px solid var(--linea2);font-size:7.8pt;text-align:right;vertical-align:top}
+tbody td:first-child,
+tbody td.txt-col{text-align:left}
+thead th.txt-col{text-align:left}
+tbody tr:nth-child(even) td{background:#FAFAFA}
+.sum{font-weight:700;font-size:8pt;display:block;line-height:1.25}
+.cups{font-size:5.8pt;color:var(--gris);display:block;margin-top:.4mm;line-height:1.3}
+.tar{
+  display:inline-block;background:#EFEFEF;border-radius:.8mm;
+  padding:.3mm 1.4mm;font-size:6.5pt;font-weight:700;letter-spacing:.04em;
+}
+.oferta{font-weight:700;color:var(--tinta)}
+.ah,.pc{font-weight:700;color:var(--verde)}
+.opt{font-size:5.8pt;color:var(--gris);display:block;margin-top:.4mm}
+.opt::before{content:"● ";color:var(--amarillo)}
+tfoot td{
+  background:var(--crema);border-top:1.4px solid var(--tinta);border-bottom:1.4px solid var(--tinta);
+  font-weight:700;font-size:8.2pt;padding:2mm 1.5mm;text-align:right;
+}
+tfoot td:first-child{text-align:left}
+
+/* ---------- Desglose por tarifa ---------- */
+.desglose{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-top:1mm}
+.bloque{border:1px solid var(--linea);border-radius:1.5mm;overflow:hidden}
+.bloque .cap{
+  background:var(--negro);color:#fff;padding:1.8mm 3mm;
+  display:flex;justify-content:space-between;align-items:baseline;gap:3mm;
+}
+.bloque .cap .t{font-size:9.5pt;font-weight:700;color:var(--amarillo)}
+.bloque .cap .d{font-size:6.8pt;color:#C9C9C9}
+.bloque .fila{display:flex;justify-content:space-between;padding:1.6mm 3mm;border-bottom:1px solid var(--linea2);font-size:8.5pt}
+.bloque .fila:last-child{border-bottom:none;font-weight:700}
+.bloque .fila:last-child span:last-child{color:var(--verde)}
+.bloque .fila span:first-child{color:var(--gris2)}
+.bloque .fila:last-child span:first-child{color:var(--tinta)}
+
+/* ---------- Avisos y listas ---------- */
+.aviso{
+  background:var(--crema);border-left:1.2mm solid var(--amarillo);
+  padding:2.2mm 3.5mm;font-size:8pt;color:var(--gris2);
+  line-height:1.55;border-radius:0 1mm 1mm 0;
+}
+.aviso b{color:var(--tinta)}
+.pasos{list-style:none;margin-top:1mm}
+.pasos li{
+  font-size:8.5pt;color:var(--gris2);line-height:1.5;
+  padding-left:5mm;margin-bottom:1.8mm;position:relative;
+}
+.pasos li::before{
+  content:"";position:absolute;left:0;top:1.4mm;
+  width:2mm;height:2mm;background:var(--amarillo);border-radius:.4mm;
+}
+.pasos b{color:var(--tinta)}
+.nota-pie{font-size:6.6pt;color:var(--gris);line-height:1.5;margin-top:2.5mm}
+.nota-pie::before{content:"● ";color:var(--amarillo)}
+
+/* ---------- Pie ---------- */
+.pie{margin-top:auto;padding-top:5mm}
+.sello{
+  display:inline-block;margin-top:4mm;padding:.6mm 3.5mm;
+  border:1px solid var(--amarillo);border-radius:1mm;
+  font-size:7pt;font-weight:700;color:#B08C00;letter-spacing:.2em;text-transform:uppercase;
+}
+.legal{
+  margin-top:2mm;padding-top:1.4mm;border-top:1px solid var(--linea2);
+  font-size:6.2pt;color:var(--gris);line-height:1.45;
+  display:flex;justify-content:space-between;gap:6mm;
+}
+
+/* ---------- Edición ---------- */
+[contenteditable]{outline:none;border-radius:1px}
+[contenteditable]:hover{background:rgba(255,203,0,.16)}
+[contenteditable]:focus{background:rgba(255,203,0,.34)}
+.kpi.hero [contenteditable]:hover,.bloque .cap [contenteditable]:hover{background:rgba(255,203,0,.22)}
+[contenteditable]:empty::before{content:attr(data-ph);color:#C8C8C8}
+.quitar{border:none;background:none;color:#C4C4C4;cursor:pointer;font-size:11px;line-height:1;padding-left:1.5mm}
+.quitar:hover{color:#D33}
+
+/* ---------- Barra ---------- */
+.barra{
+  position:sticky;top:0;z-index:9;background:#141414;color:#fff;
+  padding:9px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;
+}
+.barra .marca{font-weight:700;letter-spacing:.08em;margin-right:auto}
+.barra .marca b{color:var(--amarillo)}
+.barra button{font:inherit;padding:6px 12px;border-radius:5px;cursor:pointer;background:#2E2E2E;color:#fff;border:1px solid #454545}
+.barra button:hover{background:#3C3C3C}
+.barra button.pri{background:var(--amarillo);color:#141414;border-color:var(--amarillo);font-weight:700}
+.barra label{display:flex;align-items:center;gap:6px;color:#BDBDBD;cursor:pointer}
+
+@media print{
+  @page{size:A4;margin:0}
+  html{background:#fff}
+  .barra{display:none}
+  .hoja{width:auto;min-height:auto;margin:0;box-shadow:none;page-break-after:always}
+  .hoja:last-of-type{page-break-after:auto}
+  [contenteditable]:hover,[contenteditable]:focus{background:none}
+  /* Los huecos vacíos se imprimen en blanco, no con su texto de ayuda */
+  [contenteditable]:empty::before{content:""}
+  .quitar{display:none}
+  tr,.bloque,.pasos li,.aviso{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <span class="marca">OHM <b>ENERGY</b> · informe ejecutivo</span>
+  <label><input type="checkbox" id="sw-sello" checked> Sello «modelo»</label>
+  <button id="add">+ Suministro</button>
+  <button class="pri" onclick="window.print()">Imprimir / PDF</button>
+</div>
+
+<!-- ===================== PÁGINA 1 ===================== -->
+<div class="hoja">
+
+  <header class="cab">
+    <!-- LOGO OHM ENERGY — vectorizado a partir del logotipo original.
+         Para usar el archivo de marca: <img src="logo-ohm.svg" alt="OHM ENERGY"> -->
+    <div class="logo">
+      <svg viewBox="0 0 748 335" role="img" aria-label="OHM ENERGY">
+        <circle cx="122" cy="121" r="86" fill="none" stroke="#FFCB00" stroke-width="28"/>
+        <g fill="#1A1A1A">
+          <rect x="296" y="26" width="25" height="190"/>
+          <rect x="440" y="26" width="25" height="190"/>
+          <rect x="296" y="109" width="169" height="22"/>
+        </g>
+        <path d="M543 24 L635.5 126.2 L728 24 L728 55.5 L635.5 157.7 L543 55.5 Z" fill="#FFCB00"/>
+        <g fill="#1A1A1A">
+          <path d="M546 88 L570 114.5 L570 215 L546 215 Z"/>
+          <path d="M727 84 L727 215 L703 215 L703 110.5 Z"/>
+        </g>
+        <text x="57" y="320" fill="#1A1A1A" textLength="634" lengthAdjust="spacing"
+              font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+              font-size="64" font-weight="300">ENERGY</text>
+      </svg>
+    </div>
+    <div class="cab-t">
+      <h1 contenteditable data-ph="Tipo de documento">Informe ejecutivo</h1>
+      <div class="plan" contenteditable data-ph="Subtítulo">Estudio de ahorro</div>
+    </div>
+  </header>
+
+  <div class="regla"></div>
+
+  <section class="datos">
+    <div class="celda"><span class="et">Cliente</span>
+      <span class="va" contenteditable data-ph="Razón social">GRUPO EGIPTO, S.L.</span></div>
+    <div class="celda"><span class="et">Nº de estudio</span>
+      <span class="va" contenteditable data-ph="EST-0000-0000">EST-2026-0041</span></div>
+
+    <div class="celda"><span class="et">Suministros analizados</span>
+      <span class="va" id="d-num">0</span></div>
+    <div class="celda"><span class="et">Fecha</span>
+      <span class="va" contenteditable data-ph="dd/mm/aaaa">30/09/2026</span></div>
+
+    <div class="celda"><span class="et">Consumo total</span>
+      <span class="va" id="d-kwh">0 kWh/año</span></div>
+    <div class="celda"><span class="et">Periodo analizado</span>
+      <span class="va" contenteditable data-ph="mm/aaaa — mm/aaaa">09/2025 — 08/2026</span></div>
+
+    <div class="celda"><span class="et">Tarifas</span>
+      <span class="va" id="d-tar">—</span></div>
+    <div class="celda"><span class="et">Validez de la oferta</span>
+      <span class="va" contenteditable data-ph="dd/mm/aaaa">31/10/2026</span></div>
+  </section>
+
+  <div class="sec">Resumen ejecutivo</div>
+  <p class="txt" contenteditable data-ph="Resumen para el cliente">
+    Hemos auditado los <b id="t-num">8</b> suministros del grupo, contrastando su coste actual con la mejor
+    oferta de OHM para cada punto. El análisis parte de las facturas reales del periodo indicado e incluye
+    impuestos (impuesto eléctrico e IVA), de modo que las cifras son directamente comparables con lo que el
+    cliente paga hoy. Los puntos marcados como ya optimizados están prácticamente en precio óptimo: su valor
+    no es el ahorro, sino consolidar proveedor y blindar el precio.
+  </p>
+
+  <div class="kpis">
+    <div class="kpi">
+      <span class="et">Gasto actual</span>
+      <div class="n" id="k-actual">0 €</div>
+      <div class="u">€/año, impuestos incluidos</div>
+    </div>
+    <div class="kpi hero">
+      <span class="et">Ahorro estimado</span>
+      <div class="n" id="k-ahorro">0 €</div>
+      <div class="u">€/año con la oferta OHM</div>
+    </div>
+    <div class="kpi verde">
+      <span class="et">Reducción</span>
+      <div class="n" id="k-pct">0 %</div>
+      <div class="u">sobre el coste actual</div>
+    </div>
+  </div>
+
+  <div class="sec">Oferta por suministro</div>
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th style="width:20%">Suministro</th>
+        <th style="width:7%">Tarifa</th>
+        <th style="width:9%">Consumo<br>(kWh/año)</th>
+        <th class="txt-col" style="width:14%">Comercializadora<br>actual</th>
+        <th style="width:11%">Coste actual<br>(€/año)</th>
+        <th class="txt-col" style="width:15%">Oferta OHM</th>
+        <th style="width:11%">Coste nuevo<br>(€/año)</th>
+        <th style="width:13%">Ahorro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Restaurante Egipto · La Rambla</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...951927028ZP</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">3.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">34.600</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">Endesa Energía</td>
+        <td class="act" contenteditable data-ph="0,00">8.324,96</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">7.004,17</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Egipto Take Away · Carrer Nou</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...756765044PQ</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">3.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">17.293</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">Iberdrola Clientes</td>
+        <td class="act" contenteditable data-ph="0,00">4.070,91</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">3.657,25</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Obrador Egipto · Polígon Sud</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...977974002VB</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">3.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">38.159</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">Naturgy Iberia</td>
+        <td class="act" contenteditable data-ph="0,00">6.853,26</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">6.522,04</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Egipto Cafè · Plaça Major</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...756765062DB</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">2.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">11.362</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">Endesa Energía</td>
+        <td class="act" contenteditable data-ph="0,00">3.141,15</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">2.887,06</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Egipto Express · Av. Diagonal</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...756765014FD</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">2.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">9.163</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">TotalEnergies</td>
+        <td class="act" contenteditable data-ph="0,00">2.508,59</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">2.329,26</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+      <tr>
+        <td><span class="sum" contenteditable data-ph="Nombre del suministro">Almacén Egipto · Sant Iscle</span><span class="cups" contenteditable data-ph="CUPS">CUPS ...951927057SZ</span><span class="opt" contenteditable data-ph="">ya optimizado</span></td>
+        <td><span class="tar" contenteditable data-ph="3.0TD">2.0TD</span></td>
+        <td class="kwh" contenteditable data-ph="0">4.037</td>
+        <td class="txt-col" contenteditable data-ph="Comercializadora">Energía XXI</td>
+        <td class="act" contenteditable data-ph="0,00">1.069,27</td>
+        <td class="oferta txt-col" contenteditable data-ph="Producto">OHM Basic Fijo 12</td>
+        <td class="nue" contenteditable data-ph="0,00">1.052,41</td>
+        <td><span class="ah">0,00 €</span><span class="pc" style="display:block;font-size:6.8pt">0 %</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Total · <span id="f-num">0</span> suministros</td>
+        <td id="f-kwh">0</td>
+        <td></td>
+        <td id="f-act">0,00 €</td>
+        <td></td>
+        <td id="f-nue">0,00 €</td>
+        <td><span id="f-ah">0,00 €</span><span id="f-pc" style="display:block;font-size:6.8pt;color:var(--verde)">0 %</span></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p class="nota-pie" contenteditable data-ph="Aclaración sobre los suministros ya optimizados">
+    Ya optimizado: el suministro está prácticamente en precio óptimo. El valor de la propuesta es la
+    consolidación de proveedor y el blindaje del precio, no el ahorro.
+  </p>
+
+  <div class="pie">
+    <div class="legal">
+      <span contenteditable data-ph="Razón social y actividad"><b>OHM ENERGY, S.L.</b> · Comercializadora de electricidad</span>
+      <span contenteditable data-ph="Referencia">Informe ejecutivo · página 1 de 2</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== PÁGINA 2 ===================== -->
+<div class="hoja">
+
+  <header class="cab">
+    <div class="logo">
+      <svg viewBox="0 0 748 335" role="img" aria-label="OHM ENERGY">
+        <circle cx="122" cy="121" r="86" fill="none" stroke="#FFCB00" stroke-width="28"/>
+        <g fill="#1A1A1A">
+          <rect x="296" y="26" width="25" height="190"/>
+          <rect x="440" y="26" width="25" height="190"/>
+          <rect x="296" y="109" width="169" height="22"/>
+        </g>
+        <path d="M543 24 L635.5 126.2 L728 24 L728 55.5 L635.5 157.7 L543 55.5 Z" fill="#FFCB00"/>
+        <g fill="#1A1A1A">
+          <path d="M546 88 L570 114.5 L570 215 L546 215 Z"/>
+          <path d="M727 84 L727 215 L703 215 L703 110.5 Z"/>
+        </g>
+        <text x="57" y="320" fill="#1A1A1A" textLength="634" lengthAdjust="spacing"
+              font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+              font-size="64" font-weight="300">ENERGY</text>
+      </svg>
+    </div>
+    <div class="cab-t">
+      <h1>Informe ejecutivo</h1>
+      <div class="plan" contenteditable data-ph="Cliente">Grupo Egipto, S.L.</div>
+    </div>
+  </header>
+
+  <div class="regla"></div>
+
+  <div class="sec">Lógica de la propuesta</div>
+  <p class="txt" contenteditable data-ph="Párrafo">
+    La mayoría de los suministros del grupo ya están en precio fijo, lo que es una buena posición de partida,
+    pero a precios mejorables. La oportunidad es <b>asegurar un precio fijo más bajo antes de que las
+    comercializadoras actuales revisen sus tarifas al alza</b>, algo previsible en el contexto de mercado actual.
+  </p>
+  <p class="txt" contenteditable data-ph="Párrafo">
+    La oferta de OHM <b>mantiene el precio sin subidas durante los doce primeros meses</b>, sin coste de alta ni
+    de cambio de comercializadora, sin fees ocultos y sin cargos adicionales. El cambio lo tramita OHM ante la
+    distribuidora y no interrumpe el suministro en ningún momento.
+  </p>
+
+  <div class="sec">Desglose del ahorro por tarifa</div>
+  <div class="desglose" id="desglose"></div>
+
+  <p class="txt" style="margin-top:4mm" contenteditable data-ph="Lectura del desglose">
+    El grueso del ahorro se concentra en los suministros de mayor consumo, donde una misma mejora de precio
+    unitario se multiplica por muchos más kWh. En los puntos ya optimizados el recorrido es testimonial y el
+    valor reside en consolidar proveedor y blindar el precio.
+  </p>
+
+  <div class="sec">Palanca adicional · potencia contratada</div>
+  <div class="aviso" contenteditable data-ph="Palanca adicional">
+    Varios suministros presentan <b>potencia contratada por encima de sus maxímetros reales</b>, lo que abre un
+    ahorro adicional en el término de potencia <b>no incluido</b> en las cifras anteriores. Esta optimización es
+    cuantificable con detalle disponiendo de la curva cuartohoraria, y no requiere cambios operativos ni
+    interrupciones de la actividad.
+  </div>
+
+  <div class="sec">Próximos pasos</div>
+  <ol class="pasos">
+    <li contenteditable data-ph="Paso"><b>Confirmar las ofertas</b> recomendadas para cada uno de los suministros del grupo.</li>
+    <li contenteditable data-ph="Paso"><b>Analizar la potencia contratada</b> a partir de la curva cuartohoraria de cada punto.</li>
+    <li contenteditable data-ph="Paso"><b>Revisión conjunta</b> del detalle por suministro, con un informe individual por CUPS.</li>
+  </ol>
+
+  <div class="pie">
+    <div class="aviso" contenteditable data-ph="Advertencias metodológicas">
+      Las cifras de este informe se presentan <b>con impuestos incluidos</b> (impuesto eléctrico e IVA), para que
+      sean comparables con las facturas actuales del cliente. El ahorro es una <b>estimación</b> referida a un
+      consumo anual equivalente al del periodo analizado; variaciones de consumo, de peajes o de cargos regulados
+      modificarán el resultado.
+    </div>
+
+    <div class="sello" id="sello">Modelo · documento sin validez</div>
+
+    <div class="legal">
+      <span contenteditable data-ph="Datos de contacto">OHM ENERGY, S.L. · NIF B00000000 · Calle Ejemplo 1 · 08001 Barcelona · 900 000 000 · clientes@ohmenergy.es</span>
+      <span contenteditable data-ph="Referencia">Informe ejecutivo · página 2 de 2</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// useGrouping:true fuerza el punto de millar también en los números de cuatro
+// dígitos, que el locale español deja sin separar por omisión (2515 vs 2.515).
+const EUR  = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR', useGrouping:true});
+const MILE = new Intl.NumberFormat('es-ES', {useGrouping:true});
+
+// Lee números en formato es-ES ("8.324,96", "34.600") y también "8324.96".
+function num(txt){
+  const s = (txt || '').replace(/[^\d,.\-]/g, '');
+  if (!s) return 0;
+  let norm;
+  if (s.includes(',')) {
+    norm = s.replace(/\./g, '').replace(',', '.');      // la coma es el decimal
+  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) {
+    norm = s.replace(/\./g, '');                        // puntos de millar
+  } else {
+    norm = s;
+  }
+  const n = parseFloat(norm);
+  return Number.isFinite(n) ? n : 0;
+}
+const c2 = n => Math.round(n * 100) / 100;
+
+// Entero cuando la cifra es redonda ("16 %"), con un decimal cuando no ("1,1 %").
+function pct(parte, total){
+  if (!total) return '0 %';
+  const p = parte / total * 100;
+  const dec = Math.abs(p - Math.round(p)) < 0.05 ? 0 : 1;
+  return p.toLocaleString('es-ES', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + ' %';
+}
+
+function recalcular(){
+  const filas = [...document.querySelectorAll('#tabla tbody tr')];
+  let kwh = 0, act = 0, nue = 0;
+  const grupos = new Map();                              // tarifa -> acumulados
+
+  filas.forEach(tr => {
+    const k = num(tr.querySelector('.kwh').textContent);
+    const a = num(tr.querySelector('.act').textContent);
+    const n = num(tr.querySelector('.nue').textContent);
+    const ahorro = c2(a - n);
+
+    tr.querySelector('.ah').textContent = EUR.format(ahorro);
+    tr.querySelector('.pc').textContent = pct(ahorro, a);
+
+    kwh += k; act += a; nue += n;
+
+    const t = (tr.querySelector('.tar').textContent || '—').trim();
+    const g = grupos.get(t) || {n:0, kwh:0, act:0, nue:0};
+    g.n++; g.kwh += k; g.act += a; g.nue += n;
+    grupos.set(t, g);
+  });
+
+  act = c2(act); nue = c2(nue);
+  const ahorro = c2(act - nue);
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+  set('k-actual', EUR.format(act));
+  set('k-ahorro', EUR.format(ahorro));
+  set('k-pct',    pct(ahorro, act));
+
+  set('f-num', filas.length);  set('f-kwh', MILE.format(kwh));
+  set('f-act', EUR.format(act)); set('f-nue', EUR.format(nue));
+  set('f-ah',  EUR.format(ahorro)); set('f-pc', pct(ahorro, act));
+
+  set('d-num', filas.length + (filas.length === 1 ? ' suministro' : ' suministros'));
+  set('d-kwh', MILE.format(kwh) + ' kWh/año');
+  set('d-tar', [...grupos.keys()].join(' · '));
+  set('t-num', filas.length);
+
+  // Un bloque de desglose por tarifa, de mayor a menor ahorro.
+  const cont = document.getElementById('desglose');
+  cont.innerHTML = '';
+  [...grupos.entries()]
+    .sort((x, y) => (y[1].act - y[1].nue) - (x[1].act - x[1].nue))
+    .forEach(([tarifa, g]) => {
+      const ah = c2(g.act - g.nue);
+      const el = document.createElement('div');
+      el.className = 'bloque';
+      el.innerHTML =
+        '<div class="cap"><span class="t"></span><span class="d"></span></div>' +
+        '<div class="fila"><span>Coste actual</span><span></span></div>' +
+        '<div class="fila"><span>Coste con la oferta OHM</span><span></span></div>' +
+        '<div class="fila"><span>Ahorro anual</span><span></span></div>';
+      const [t, d] = el.querySelectorAll('.cap span');
+      t.textContent = tarifa;
+      d.textContent = g.n + (g.n === 1 ? ' suministro · ' : ' suministros · ') + MILE.format(g.kwh) + ' kWh/año';
+      const v = el.querySelectorAll('.fila span:last-child');
+      v[0].textContent = EUR.format(c2(g.act));
+      v[1].textContent = EUR.format(c2(g.nue));
+      v[2].textContent = EUR.format(ah) + ' · ' + pct(ah, g.act);
+      cont.appendChild(el);
+    });
+}
+
+document.getElementById('add').addEventListener('click', () => {
+  const tb = document.querySelector('#tabla tbody');
+  const tr = tb.rows[0].cloneNode(true);
+  tr.querySelectorAll('[contenteditable]').forEach(c => c.textContent = '');
+  tr.querySelector('.cups').insertAdjacentHTML('beforeend',
+    '<button class="quitar" title="Eliminar suministro">&times;</button>');
+  tb.appendChild(tr);
+  tr.querySelector('[contenteditable]').focus();
+  recalcular();
+});
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('.quitar');
+  if (!b) return;
+  b.closest('tr').remove();
+  recalcular();
+});
+
+document.getElementById('sw-sello').addEventListener('change', e => {
+  document.getElementById('sello').style.display = e.target.checked ? '' : 'none';
+});
+
+document.addEventListener('input', recalcular);
+
+// Pegar siempre como texto plano para no romper el formato.
+document.addEventListener('paste', e => {
+  if (!e.target.closest('[contenteditable]')) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+});
+
+recalcular();
+</script>
+</body>
+</html>
